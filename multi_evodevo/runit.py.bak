@@ -5,10 +5,10 @@ Author: Joshua Hawthorne-Madell
 """
 
 import os
-import multiprocessing as mp
+import multiprocess as mp
 from functools import partial
 import sqlite3
-import pickle
+import cPickle
 from operator import itemgetter
 from numpy.random import RandomState
 import cProfile
@@ -35,13 +35,12 @@ def do_cprofile(func):
     return profiled_func
 
 
-def make_io_file(pop, repro_cond, build_cond, grav, io_dir='../io/'):
+def make_io_file(pop, repro_cond, build_cond, io_dir='../io/'):
     mod_repro_cond = int(repro_cond * 10000)
     mod_build_cond = int(build_cond * 10000)
-    cond_str = 'pop{}r{:04}b{:04}pop{}'.format(pop,
+    cond_str = 'pop{}r{:04}b{:04}'.format(pop,
                                           mod_repro_cond,
-                                          mod_build_cond,
-                                          grav)
+                                          mod_build_cond)
     io_file = ''.join((io_dir, cond_str))
     if not os.path.isdir(io_file):
         os.makedirs(io_file)
@@ -67,7 +66,7 @@ def fill_population_table(table, db='../data/population_genes.db'):
     c = conn.cursor()
     pop = list()
     prng = RandomState(24)
-    for i in range(60):
+    for i in xrange(60):
         genome = initiate.generate_genome(18000, prng)
         pop.append((i, genome))
     s = 'INSERT into pop{} VALUES (?, ?)'.format(table)
@@ -78,7 +77,7 @@ def fill_population_table(table, db='../data/population_genes.db'):
 
 def make_filled_db(db='../data/population_genes.db', num=10):
     make_population_db(db, num)
-    for i in range(num):
+    for i in xrange(num):
         fill_population_table(i, db)
 
 
@@ -95,13 +94,12 @@ def grab_pop_genome(table, agent, db='../data/population_genes.db'):
 
 # Create and manage simulation data
 def make_sql_db(population, reproduction_cond,
-                building_cond, generations, grav):
+                building_cond, generations):
     mod_repro_cond = int(reproduction_cond * 10000)
     mod_build_cond = int(building_cond * 10000)
     the_file = '../data/pop{}r{:04}b{:04}.db'.format(population,
                                                      mod_repro_cond,
-                                                     mod_build_cond,
-                                                     grav)
+                                                     mod_build_cond)
     if not os.path.isdir(the_file[:8]):
         os.path.makedirs(the_file[:8])
     while (os.path.isfile(the_file)):
@@ -118,7 +116,7 @@ def make_sql_db(population, reproduction_cond,
     # print the_file
     conn = sqlite3.connect(the_file)
     c = conn.cursor()
-    for i in range(generations):
+    for i in xrange(generations):
         s = '''CREATE TABLE gen{} (sim_num INT PRIMARY KEY,
         parent INT, fitness REAL, reproduction_error_rate REAL,
         buidling_error_rate REAL, germline_genes TEXT,
@@ -148,11 +146,11 @@ def grab_sim_selection_data(db, gen):
     conn.close()
     fitness = [data[i][1] for i in range(len(data))]
     genomes = [(data[i][0], data[i][2]) for i in range(len(data))]
-    while fitness[-1] == '-nan':
-        print(fitness)
+    while fitness[-1] == u'-nan':
+        print fitness
         fitness.pop()
         fitness.insert(0, 0)
-        print(fitness)
+        print fitness
         genomes.insert(0, genomes.pop())
     return [fitness, genomes]
 
@@ -170,7 +168,7 @@ def grab_a_genome(db, gen, agent, u=False):
         fitness = [data[i][0] for i in range(len(data))]
         germ_g = [data[i][1] for i in range(len(data))]
         soma_g = [data[i][2] for i in range(len(data))]
-        while fitness[-1] == '-nan':
+        while fitness[-1] == u'-nan':
             fitness.pop()
             fitness.insert(0, 0)
             germ_g.insert(0, germ_g.pop())
@@ -217,9 +215,9 @@ def compare_data(db1, db2, gen):
         diff.append([data1[i][j] == data2[i][j] for j in range(1, 4)])
     for num, check in enumerate(diff):
         if all(check):
-            print(data1[num][0], check)
+            print data1[num][0], check
         else:
-            print(data1[num][0], check, data1[num][1], data2[num][1])
+            print data1[num][0], check, data1[num][1], data2[num][1]
 
 
 # Run and view one agent
@@ -231,7 +229,7 @@ def test_one_agent(pop, gen, build_er, repro_er, version, agent):
         index = db.find('.db')
         insert = ''.join((' (', str(version), ')'))
         db = ''.join((db[:index], insert, db[index:]))
-    print(db)
+    print db
     io_file = ''.join((make_io_file(pop, repro_er, build_er), '/'))
     genome, genome_to_build = grab_a_genome(db, gen, agent)
     filler_prng = RandomState(2)
@@ -300,16 +298,16 @@ def check_data(og, cp):
                         cp_file = os.path.join(dirname2, filename2)
                         cp_data = grab_data(cp_file)
                         if cp_data != og_data:
-                            print("ERROR with ", og_file)
+                            print "ERROR with ", og_file
                             dbs_with_errors.append(og_file[-14:-4])
             if not found:
-                print("Could not find other ", og_file)
+                print "Could not find other ", og_file
     dbs_with_errors = sorted(set(dbs_with_errors))
-    print(len(dbs_with_errors), dbs_with_errors)
+    print len(dbs_with_errors), dbs_with_errors
 
 
 # Single simulation. Will be multiprocessed
-def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, grav):
+def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db):
     agent_prng = RandomState(seeds[sim_num])
     genome_info = all_genomes[sim_num]
     parent = genome_info[0]
@@ -350,25 +348,23 @@ def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, g
 
 
 def run_generations(reproduction_error_rate, build_error_rate,
-                    pop_num, grav=-9.81, generations=100, agents=60):
+                    pop_num, generations=100, agents=60):
     main_prng = RandomState(42)
 
     db_name = make_sql_db(pop_num,
                           reproduction_error_rate,
                           build_error_rate,
-                          generation, 
-                          grav)
+                          generations)
     io_file = ''.join((make_io_file(pop_num,
                                     reproduction_error_rate,
-                                    build_error_rate,
-                                    grav),
+                                    build_error_rate),
                        '/'))
     initial_genomes = list()
-    for i in range(agents):
+    for i in xrange(agents):
         initial_genomes.append((i,
                                 grab_pop_genome(pop_num,
                                                 i)))
-    for generation in range(generations):
+    for generation in xrange(generations):
         # print 'Gen:', generation, 'Genomes:', len(initial_genomes)
         # print 'Length of genomes:'
         # for i in initial_genomes:
@@ -380,7 +376,7 @@ def run_generations(reproduction_error_rate, build_error_rate,
         #         print len(i[1]),
         # print; print
         agent_prng_seeds = main_prng.randint(0, 1000000, agents+1)
-        setup_data = [generation, reproduction_error_rate, build_error_rate, grav]
+        setup_data = [generation, reproduction_error_rate, build_error_rate]
         wrap_run_one = partial(run_one,
                                seeds=agent_prng_seeds,
                                all_genomes=initial_genomes,
@@ -388,10 +384,9 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                build_er=build_error_rate,
                                repro_er=reproduction_error_rate,
                                db=db_name,
-                               io_file=io_file,
-                               grav=grav)
+                               io_file=io_file)
         sim_pool = mp.Pool(mp.cpu_count())
-        sim_pool.map(wrap_run_one, range(agents))
+        sim_pool.map(wrap_run_one, xrange(agents))
         sim_pool.close()
         sim_pool.join()
         fit_data, selection_genomes = grab_sim_selection_data(db_name,
@@ -430,54 +425,34 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                                  int(build_error_rate * 10000))
     pickle_file = ''.join(('../data/prng_states/', cond_str))
     with open(pickle_file, 'wb+') as pfw:
-        pickle.dump(main_prng, pfw)
+        cPickle.dump(main_prng, pfw)
 
 
 @do_cprofile
 def main():
     if not os.path.isfile('../data/population_genes.db'):
         make_filled_db()
-    pop_num = int(input("What population should be run? "))
-    gen_num = int(input("How many generations should be run? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Type one of the following)\n1. Gravity\nError Rate")).lower()
-    if thing_to_test.equals("gravity"):
-        grav_cond_start = int(input(
-            "Start with which gravity condition? (ex: 10)"))
-        grav_cond_end = int(input(
-            "End with which gravity condition? (ex: 10)"))
-        rep_cond = float(input(
-            "Start with which reproduction error condition? "))
-        build_cond = float(input(
-            "Start with which build error condition? "))
-        for grav_cond in range(grav_cond_start, grav_cond_end+1, 2):
-            print("Starting Gravity", grav_cond)
-            run_generations(rep_er, build_er, pop_num, grav = grav_cond)
-        return 0
-        
-        
-    elif thing_to_test.equals("error rate"):
-        rep_cond_start = int(input(
-            "Start with which reproduction error condition? "))
-        build_cond_start = int(input(
-            "Start with which build error condition? "))
-        rep_cond_end = int(input(
-            "End with which reproduction error condition? "))
-        build_cond_end = int(input(
-            "End with which build error condition? "))
-        for rep_er_cond in range(rep_cond_start, rep_cond_end+1, 5):
-            rep_er = rep_er_cond / 10000.
-            for build_er_cond in range(build_cond_start, build_cond_end+1, 5):
-                build_er = build_er_cond / 10000.
-        # for rep_cond in xrange(5, 51, 5):
-        #     rep_er = rep_cond / 10000.
-        #     for build_cond in xrange(5, 51, 5):
-        #         build_er = build_cond / 10000.
-                print("Start condition ", [rep_er, build_er])
-                run_generations(rep_er, build_er, pop_num)
-        return 0
-    else:
-        return "Error. Stopping experiment"
-    
+    pop_num = int(raw_input("What population should be run? "))
+    gen_num = int(raw_input("How many generations should be run? "))
+    rep_cond_start = int(raw_input(
+        "Start with which reproduction error condition? "))
+    build_cond_start = int(raw_input(
+        "Start with which build error condition? "))
+    rep_cond_end = int(raw_input(
+        "End with which reproduction error condition? "))
+    build_cond_end = int(raw_input(
+        "End with which build error condition? "))
+    for rep_er_cond in xrange(rep_cond_start, rep_cond_end+1, 5):
+        rep_er = rep_er_cond / 10000.
+        for build_er_cond in xrange(build_cond_start, build_cond_end+1, 5):
+            build_er = build_er_cond / 10000.
+    # for rep_cond in xrange(5, 51, 5):
+    #     rep_er = rep_cond / 10000.
+    #     for build_cond in xrange(5, 51, 5):
+    #         build_er = build_cond / 10000.
+            print "Start condition ", [rep_er, build_er]
+            run_generations(rep_er, build_er, pop_num)
+    return 0
 
 
 # Script to run 1 population through all conditions, serially

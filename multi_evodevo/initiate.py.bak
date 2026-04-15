@@ -7,7 +7,6 @@ Author: Joshua Hawthorne-Madell
 from my_table import table
 from part import Part
 from subpart import (BodyPart, JointPart, NeuronPart, SensorPart, WirePart)
-import random
 
 
 def generate_genome(num_chars, rand_state):
@@ -23,7 +22,7 @@ def generate_genome(num_chars, rand_state):
     """
     # germ_genome = ''
     lgerm_genome = list()
-    for i in range(num_chars):
+    for i in xrange(num_chars):
         lgerm_genome.append(str(rand_state.random_sample()))
     germ_genome = ''.join(lgerm_genome)
     return germ_genome
@@ -58,9 +57,9 @@ def add_noise(genome, error_rate, rand_state):
 # testers for add_noise()
 def tan(g, e, n):
     t = list()
-    for i in range(n):
+    for i in xrange(n):
         t.append(add_noise(g, e))
-    print([t[i] for i in range(n) if len(t[i]) < 18000])
+    print [t[i] for i in range(n) if len(t[i]) < 18000]
 
 
 def tan2(e, n, g=None):

@@ -58,6 +58,7 @@ bool myContactProcessedCallback(btManifoldPoint& cp, void* body0, void* body1)
 
 void NoiseWorld::initPhysics()
 {
+
   //collision stuff
   noiseWorld = this;
   gContactProcessedCallback = myContactProcessedCallback;

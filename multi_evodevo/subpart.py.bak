@@ -76,7 +76,7 @@ class BodyPart(Part):
             if any(location):
                 location = location / np.linalg.norm(location)
                 if any((location == i).all() or (location == j).all()
-                       for i, j in zip(self.s_mount_loc,
+                       for i, j in itertools.izip(self.s_mount_loc,
                                                   self.j_mount_loc)):
                     pass
                 else:
@@ -92,7 +92,7 @@ class BodyPart(Part):
             if any(location):
                 location = location / np.linalg.norm(location)
                 if any((location == i).all() or (location == j).all()
-                       for i, j in zip(self.s_mount_loc,
+                       for i, j in itertools.izip(self.s_mount_loc,
                                                   self.j_mount_loc)):
                     pass
                 else:

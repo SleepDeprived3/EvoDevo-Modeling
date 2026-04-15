@@ -39,10 +39,10 @@ def frame_raiser(bodypart_list, jointpart_list):
         low_point = min(points_below)
         amount_to_raise = abs(low_point) + .1
 
-        for i in range(len(bodypart_list)):
+        for i in xrange(len(bodypart_list)):
             new_y = bodypart_list[i].y_loc + amount_to_raise
             bodypart_list[i] = bodypart_list[i]._replace(y_loc=new_y)
-        for i in range(len(jointpart_list)):
+        for i in xrange(len(jointpart_list)):
             new_y = jointpart_list[i].y_loc + amount_to_raise
             jointpart_list[i] = jointpart_list[i]._replace(y_loc=new_y)
         return [bodypart_list, jointpart_list]
@@ -164,9 +164,9 @@ def make_matrix(wire_list, wire_parts, tos_type, tos, froms_type, froms):
 
     """
     matrix = []
-    for i in range(froms):
+    for i in xrange(froms):
         row = []
-        for j in range(tos):
+        for j in xrange(tos):
             row.append(find_wire_weight(wire_list, wire_parts, tos_type, j,
                                         froms_type, i))
         matrix.append(row)

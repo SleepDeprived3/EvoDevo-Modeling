@@ -117,7 +117,7 @@ def select_frame_parts(developed_parts):
             return [used_bodys, used_joints]
         # Get next joint part
         if unused_joints:
-            bi = [i for i in range(len(used_bodys))
+            bi = [i for i in xrange(len(used_bodys))
                   if used_bodys[i].body_index == base_pointer][0]
             joint_part = Joint(joint=unused_joints[0][0],
                                base_body=base_pointer,
@@ -158,7 +158,7 @@ def select_neuron_parts(developed_parts, frame_parts):
     """
     neuron_list = [i for i in developed_parts
                    if i.__class__ == NeuronPart]
-    unused_neurons = list(range(len(neuron_list)))
+    unused_neurons = range(len(neuron_list))
     used_neurons = list()
     body_list = [i for i in developed_parts
                  if (i.__class__ == BodyPart and
@@ -168,7 +168,7 @@ def select_neuron_parts(developed_parts, frame_parts):
                            mounts_total=body_list[part.body_index].characteristics.neuron_mount_num)
                      for part in frame_parts[0]]
 
-    for i in itertools.cycle(list(range(len(neuron_mounts)))):
+    for i in itertools.cycle(range(len(neuron_mounts))):
         if unused_neurons and mounts_left(neuron_mounts):
             if mounts_left([neuron_mounts[i]]):
                 neuron_part = Neuron(neuron=unused_neurons[0],
@@ -189,7 +189,7 @@ def select_sensor_parts(developed_parts, frame_parts):
     """
     sensor_list = [i for i in developed_parts
                    if i.__class__ == SensorPart]
-    unused_sensors = list(range(len(sensor_list)))
+    unused_sensors = range(len(sensor_list))
     used_sensors = list()
     body_list = [i for i in developed_parts
                  if (i.__class__ == BodyPart and
@@ -199,7 +199,7 @@ def select_sensor_parts(developed_parts, frame_parts):
                            mounts_total=body_list[part.body_index].characteristics.sensor_mount_num)
                      for part in frame_parts[0]]
 
-    for i in itertools.cycle(list(range(len(sensor_mounts)))):
+    for i in itertools.cycle(range(len(sensor_mounts))):
         if unused_sensors and mounts_left(sensor_mounts):
             if mounts_left([sensor_mounts[i]]):
                 sensor_part = Sensor(sensor=unused_sensors[0],
@@ -220,27 +220,27 @@ def make_wire_part(part, case, generators):
     if case == 'S->J':
         return Wire(wire=part[0],
                     from_type=SensorPart,
-                    from_index=next(generators[3]),
+                    from_index=generators[3].next(),
                     to_type=JointPart,
-                    to_index=next(generators[0]))
+                    to_index=generators[0].next())
     elif case == 'S->N':
         return Wire(wire=part[0],
                     from_type=SensorPart,
-                    from_index=next(generators[3]),
+                    from_index=generators[3].next(),
                     to_type=NeuronPart,
-                    to_index=next(generators[1]))
+                    to_index=generators[1].next())
     elif case == 'N->J':
         return Wire(wire=part[0],
                     from_type=NeuronPart,
-                    from_index=next(generators[2]),
+                    from_index=generators[2].next(),
                     to_type=JointPart,
-                    to_index=next(generators[0]))
+                    to_index=generators[0].next())
     elif case == 'N->N':
         return Wire(wire=part[0],
                     from_type=NeuronPart,
-                    from_index=next(generators[2]),
+                    from_index=generators[2].next(),
                     to_type=NeuronPart,
-                    to_index=next(generators[1]))
+                    to_index=generators[1].next())
     else:
         raise ValueError
 
@@ -253,7 +253,7 @@ def jump_generator(generator, mount_list):
     """
     while (mount_list[generator.peek()].mounts_used >=
            mount_list[generator.peek()].mounts_total):
-        next(generator)
+        generator.next()
     return generator.peek()
 
 
@@ -296,10 +296,10 @@ def select_wire_parts(developed_parts, frame_parts,
         return used_wires
 
     # Create generators to help iterate through the mount information holders
-    joint_in_generator = peekable(itertools.cycle(list(range(len(joint_ins)))))
-    neuron_in_generator = peekable(itertools.cycle(list(range(len(neuron_ins)))))
-    neuron_out_generator = peekable(itertools.cycle(list(range(len(neuron_outs)))))
-    sensor_out_generator = peekable(itertools.cycle(list(range(len(sensor_outs)))))
+    joint_in_generator = peekable(itertools.cycle(range(len(joint_ins))))
+    neuron_in_generator = peekable(itertools.cycle(range(len(neuron_ins))))
+    neuron_out_generator = peekable(itertools.cycle(range(len(neuron_outs))))
+    sensor_out_generator = peekable(itertools.cycle(range(len(sensor_outs))))
     generator_list = [joint_in_generator, neuron_in_generator,
                       neuron_out_generator, sensor_out_generator]
     from_sensor = True

@@ -24,22 +24,22 @@ def next_generation(current_population, fitness_list, error_rate, rand_seed):
     fourth_quarter = int(round(population_size * .5))
     fitness_list = [c for c in enumerate(fitness_list)]
     selected_index = list()
-    for i in range(first_quarter):
+    for i in xrange(first_quarter):
         agent = max(fitness_list, key=itemgetter(1, 0))
-        for i in range(4):
+        for i in xrange(4):
             selected_index.append(agent[0])
         fitness_list.remove(agent)
-    for i in range(first_quarter, second_quarter):
+    for i in xrange(first_quarter, second_quarter):
         agent = max(fitness_list, key=itemgetter(1, 0))
-        for i in range(3):
+        for i in xrange(3):
             selected_index.append(agent[0])
         fitness_list.remove(agent)
-    for i in range(second_quarter, third_quarter):
+    for i in xrange(second_quarter, third_quarter):
         agent = max(fitness_list, key=itemgetter(1, 0))
-        for i in range(2):
+        for i in xrange(2):
             selected_index.append(agent[0])
         fitness_list.remove(agent)
-    for i in range(third_quarter, fourth_quarter):
+    for i in xrange(third_quarter, fourth_quarter):
         agent = max(fitness_list, key=itemgetter(1, 0))
         selected_index.append(agent[0])
         fitness_list.remove(agent)

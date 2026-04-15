@@ -312,7 +312,7 @@ class Part(object):
         o_push_list = [int(math.floor(reg_pool.get_push_rate() * i))
                        for i in push_list]
         reg_pool.pool = [i + j for i, j in
-                         zip(reg_pool.pool, o_push_list)]
+                         itertools.izip(reg_pool.pool, o_push_list)]
         return o_push_list
 
     def get_pull_list(self, reg_pool):
@@ -322,7 +322,7 @@ class Part(object):
         o_pull_list = [int(math.floor(reg_pool.get_pull_rate() * i))
                        for i in pull_list]
         reg_pool.pool = [i - j for i, j in
-                         zip(reg_pool.pool, o_pull_list)]
+                         itertools.izip(reg_pool.pool, o_pull_list)]
         for c, e in enumerate(reg_pool.pool):
             if e < 0:
                 reg_pool.pool[c] = 0
@@ -390,7 +390,7 @@ class Part(object):
         pllst = self.get_pull_list(reg_pool)
         phlst = self.get_push_list(reg_pool)
         # Negative values means more pushed than pulled
-        phpllst = [i - j for i, j in zip(pllst, phlst)]
+        phpllst = [i - j for i, j in itertools.izip(pllst, phlst)]
         self.use_phpl_list(phpllst)
         self.regulatory_elements = max(0, self.regulatory_elements +
                                        sum(phpllst))
