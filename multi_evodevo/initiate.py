@@ -24,7 +24,7 @@ def generate_genome(num_chars, rand_state):
     # germ_genome = ''
     lgerm_genome = list()
     for i in range(num_chars):
-        lgerm_genome.append(str(rand_state.random_sample()))
+        lgerm_genome.append(str(rand_state.randint(0, 4)))
     germ_genome = ''.join(lgerm_genome)
     return germ_genome
 
