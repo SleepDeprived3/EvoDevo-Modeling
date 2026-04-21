@@ -28,7 +28,8 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
     """Returns fitness after running the simulation.
 
     """
-    sim_file = '../c++/app'
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sim_file = os.path.join(base_dir, '../c++/app')
     folder_switch = '-f' + io_file
     sim_switch = '-n' + str(sim_num)
     grav_switch = '-g' + str(grav)

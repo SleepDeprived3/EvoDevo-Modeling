@@ -1,0 +1,12 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/cmake_install.cmake",
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/src/cmake_install.cmake",
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/src/BulletSoftBody/cmake_install.cmake",
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/src/BulletCollision/cmake_install.cmake",
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/src/BulletDynamics/cmake_install.cmake",
+		"/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-build/src/LinearMath/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

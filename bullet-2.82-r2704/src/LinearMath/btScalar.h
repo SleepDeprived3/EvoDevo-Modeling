@@ -182,13 +182,23 @@ inline int	btGetVersion()
         #endif //BT_USE_SSE
     #elif defined( __ARM_NEON__ )
         #ifdef __clang__
-            #define BT_USE_NEON 1
+            #ifndef BT_USE_NEON
+            #define BT_USE_NEON 0
+            #endif
 			#define BT_USE_SIMD_VECTOR3
 		
             #if defined BT_USE_NEON && defined (__clang__)
                 #include <arm_neon.h>
             #endif//BT_USE_NEON
        #endif //__clang__
+	#elif defined( __ARM_NEON__ ) || defined( __ARM_NEON ) || defined( __aarch64__ )
+		#undef BT_USE_SSE
+		#undef BT_USE_SSE_IN_API
+		#undef BT_USE_SIMD_VECTOR3
+< 			#define BT_USE_SIMD_VECTOR3
+< 		
+---
+>             #define BT_USE_SIMD_VECTOR3
     #endif//__arm__
 
 	#define SIMD_FORCE_INLINE inline __attribute__ ((always_inline))

@@ -1,34 +1,30 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
-SET(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
-  )
-# The set of files for implicit dependencies of each language:
-SET(CMAKE_DEPENDS_CHECK_CXX
-  "/root/bullet-2.82-r2704/src/LinearMath/btAlignedAllocator.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btAlignedAllocator.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btConvexHull.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHull.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btConvexHullComputer.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHullComputer.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btGeometryUtil.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btGeometryUtil.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btPolarDecomposition.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btPolarDecomposition.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btQuickprof.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btQuickprof.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btSerializer.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btSerializer.o"
-  "/root/bullet-2.82-r2704/src/LinearMath/btVector3.cpp" "/root/bullet-build/src/LinearMath/CMakeFiles/LinearMath.dir/btVector3.o"
-  )
-SET(CMAKE_CXX_COMPILER_ID "GNU")
-
-# Preprocessor definitions for this target.
-SET(CMAKE_TARGET_DEFINITIONS
-  "USE_GRAPHICAL_BENCHMARK"
+set(CMAKE_DEPENDS_LANGUAGES
   )
 
-# Targets to which this target links.
-SET(CMAKE_TARGET_LINKED_INFO_FILES
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btAlignedAllocator.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btAlignedAllocator.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btAlignedAllocator.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btConvexHull.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHull.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHull.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btConvexHullComputer.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHullComputer.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btConvexHullComputer.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btGeometryUtil.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btGeometryUtil.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btGeometryUtil.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btPolarDecomposition.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btPolarDecomposition.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btPolarDecomposition.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btQuickprof.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btQuickprof.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btQuickprof.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btSerializer.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btSerializer.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btSerializer.cpp.o.d"
+  "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/src/LinearMath/btVector3.cpp" "src/LinearMath/CMakeFiles/LinearMath.dir/btVector3.cpp.o" "gcc" "src/LinearMath/CMakeFiles/LinearMath.dir/btVector3.cpp.o.d"
   )
 
-# The include file search paths:
-SET(CMAKE_C_TARGET_INCLUDE_PATH
-  "/usr/local/include"
-  "/root/bullet-2.82-r2704/src"
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
   )
-SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
-SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
-SET(CMAKE_ASM_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

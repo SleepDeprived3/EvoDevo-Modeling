@@ -820,7 +820,7 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 }
 
 
-#elif defined BT_USE_NEON
+#elif defined BT_USE_NEON && BT_USE_NEON
 #define ARM_NEON_GCC_COMPATIBILITY  1
 #include <arm_neon.h>
 #include <sys/types.h>
