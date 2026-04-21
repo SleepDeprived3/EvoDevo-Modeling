@@ -32,15 +32,33 @@ int main(int argc, char *argv[])
 		      &simulation);
     }
   */
-  if (argc == 4)
+  if (argc == 5)
     {
       simulation.drawGraphics = true;
       simulation.ParseCmdLine(argv[1]);
       simulation.ParseCmdLine(argv[2]);
+      simulation.ParseCmdLine(argv[3]);
+      simulation.ParseCmdLine(argv[4]);
       simulation.initPhysics();
       //simulation.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
       return glutmain(argc, argv, 640, 480, "Bullet Physics Demo. http://bulletphysics.com",
 		      &simulation);
+    }
+  else if (argc == 4)
+    {
+      simulation.drawGraphics = false;
+      simulation.ParseCmdLine(argv[1]);
+      simulation.ParseCmdLine(argv[2]);
+      simulation.ParseCmdLine(argv[3]);
+      simulation.initPhysics();
+      //simulation.getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
+      //cout << "----------START SIM " << argv[1] << "----------" << endl;
+      while(simulation.timeStep <= 500) 
+	{
+	  simulation.clientMoveAndDisplay();
+	}
+      //cout << "-----------END SIM " << argv[1] << "-----------" << endl;
+      return simulation.Save_Position(true);
     }
   else if (argc == 3)
     {
@@ -59,7 +77,7 @@ int main(int argc, char *argv[])
     }
   else
     {
-      cout << "Didn't get 2 or 3 switches!" << endl;
+      cout << "Didn't get 2, 3, or 4 switches!" << endl;
       cout << "Got: " << argv << endl;
     }
 }

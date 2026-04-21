@@ -97,7 +97,7 @@ void NoiseWorld::initPhysics()
   //btDiscreteDynamicsWorld* define is in .h file 
   m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
   // Don't forget the gravity!
-  m_dynamicsWorld->setGravity(btVector3(0, -9.81, 0));
+  m_dynamicsWorld->setGravity(btVector3(0, gravity_value, 0));
 
   // ================ Objects  ========================
 
@@ -435,18 +435,10 @@ void NoiseWorld::ParseCmdLine(char* swtxt)
       {  
 	sscanf(swtxt, "-n%d", &simulation_number);
       }
-    }
-}
-
-
-void NoiseWorld::displayCallback()
-{
-  if (drawGraphics)
-    {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-      renderme();
-      if (m_dynamicsWorld)
-	{m_dynamicsWorld->debugDrawWorld();}
+    if(swtxt[1] == 'g')
+      {
+	sscanf(swtxt, "-g%f", &gravity_value);
+      }
       glFlush();
       glutSwapBuffers();
     }

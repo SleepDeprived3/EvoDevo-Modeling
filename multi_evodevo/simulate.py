@@ -24,21 +24,22 @@ def grab_data(data_file):
         # return fr.readline().strip('\n')
 
 
-def run_simulation(io_file, sim_num, test=False):
+def run_simulation(io_file, sim_num, test=False, grav=-9.81):
     """Returns fitness after running the simulation.
 
     """
     sim_file = '../c++/app'
     folder_switch = '-f' + io_file
     sim_switch = '-n' + str(sim_num)
+    grav_switch = '-g' + str(grav)
     data_file = io_file + 'sim_' + str(sim_num) + '.dat'
     check_file = io_file + 'buffer_' + str(sim_num) + '.dat'
     while not os.path.isfile(check_file):
         time.sleep(0.1)
     if not test:
-        subprocess.call([sim_file, folder_switch, sim_switch])
+        subprocess.call([sim_file, folder_switch, sim_switch, grav_switch])
     else:
-        subprocess.call([sim_file, folder_switch, sim_switch, '-t'])
+        subprocess.call([sim_file, folder_switch, sim_switch, grav_switch, '-t'])
     while not os.path.isfile(data_file):
         time.sleep(0.1)
     # fitness = float(grab_data(data_file))

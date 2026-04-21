@@ -338,7 +338,7 @@ def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, g
     export.export_all(blueprints[0], blueprints[1], blueprints[2],
                       blueprints[3], blueprints[4], blueprints[5],
                       blueprints[6], sim_num, io_file)
-    fitness = simulate.run_simulation(io_file, sim_num)
+    fitness = simulate.run_simulation(io_file, sim_num, grav=grav)
     data = (sim_num,
             parent,
             fitness,
@@ -356,7 +356,7 @@ def run_generations(reproduction_error_rate, build_error_rate,
     db_name = make_sql_db(pop_num,
                           reproduction_error_rate,
                           build_error_rate,
-                          generation, 
+                          generations, 
                           grav)
     io_file = ''.join((make_io_file(pop_num,
                                     reproduction_error_rate,
@@ -439,23 +439,21 @@ def main():
         make_filled_db()
     pop_num = int(input("What population should be run? "))
     gen_num = int(input("How many generations should be run? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Type one of the following)\n1. Gravity\nError Rate")).lower()
-    if thing_to_test.equals("gravity"):
-        grav_cond_start = int(input(
-            "Start with which gravity condition? (ex: 10)"))
-        grav_cond_end = int(input(
-            "End with which gravity condition? (ex: 10)"))
-        rep_cond = float(input(
-            "Start with which reproduction error condition? "))
-        build_cond = float(input(
-            "Start with which build error condition? "))
-        for grav_cond in range(grav_cond_start, grav_cond_end+1, 2):
-            print("Starting Gravity", grav_cond)
-            run_generations(rep_er, build_er, pop_num, grav = grav_cond)
+    thing_to_test = str(input("What type of experiment do you want to run? (Type one of the following)\n1. Gravity\n2. Error Rate")).lower()
+    if thing_to_test == "gravity":
+        rep_er = float(input(
+            "What reproduction error condition? "))
+        build_er = float(input(
+            "What build error condition? "))
+        # Run 5 generations with incrementally increasing gravity
+        gravity_values = [-4, -7, -10, -13, -16]
+        for grav_val in gravity_values:
+            print("Gravity: ", grav_val)
+            run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
         return 0
         
         
-    elif thing_to_test.equals("error rate"):
+    elif thing_to_test == "error rate":
         rep_cond_start = int(input(
             "Start with which reproduction error condition? "))
         build_cond_start = int(input(
@@ -468,12 +466,8 @@ def main():
             rep_er = rep_er_cond / 10000.
             for build_er_cond in range(build_cond_start, build_cond_end+1, 5):
                 build_er = build_er_cond / 10000.
-        # for rep_cond in xrange(5, 51, 5):
-        #     rep_er = rep_cond / 10000.
-        #     for build_cond in xrange(5, 51, 5):
-        #         build_er = build_cond / 10000.
                 print("Start condition ", [rep_er, build_er])
-                run_generations(rep_er, build_er, pop_num)
+                run_generations(rep_er, build_er, pop_num, generations=gen_num)
         return 0
     else:
         return "Error. Stopping experiment"

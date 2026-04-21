@@ -166,6 +166,7 @@ class NoiseWorld : public GlutDemoApplication
 	// ---Blueprint Variable---
 	int simulation_number;
 	char io_file[80];
+	btScalar gravity_value = -9.81;
 	btAlignedObjectArray<BodyPart> bodys;
 	btAlignedObjectArray<JointPart> joints;
 	btAlignedObjectArray<SensorPart> sensors;
