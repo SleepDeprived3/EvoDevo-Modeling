@@ -1,76 +1,56 @@
 #!/usr/bin/env bash
 set -euo pipefail
-REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-cd "$REPO_ROOT"
+REPO_ROOT="$(pwd)"
 
-OGL_SRC="$REPO_ROOT/bullet-2.82-r2704/Demos/OpenGL"
-BT_SRC="$REPO_ROOT/bullet-2.82-r2704/src"
-BUILD="$REPO_ROOT/bullet-build"
-TMP="$BUILD/_ogl_objs"
+# ── Step 1: Clean & Configure ──────────────────────────────────────────────
+# We remove the arm64 flags and let CMake detect your Intel CPU.
+rm -rf bullet-build
+mkdir bullet-build
+cd bullet-build
 
-# --- Step 1: Clean & Configure ---
-echo "--- [1/5] Configuring Bullet 2.82 for arm64 ---"
-rm -rf "$BUILD"
-mkdir -p "$BUILD"
-cd "$BUILD"
-
-cmake "$REPO_ROOT/bullet-2.82-r2704" \
-  -DCMAKE_OSX_ARCHITECTURES=arm64 \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+# Note: We use "MinGW Makefiles" to ensure it works with g++ on Windows
+cmake ../bullet-2.82-r2704 -G "MinGW Makefiles" \
   -DBUILD_DEMOS=OFF \
   -DBUILD_EXTRAS=OFF \
   -DBUILD_MULTITHREADING=OFF \
-  -DBUILD_MINICL_SUPPORT=OFF \
-  -DUSE_GRAPHICAL_BENCHMARK=OFF \
-  -DCMAKE_CXX_FLAGS="-DBT_USE_NEON=0 -DBT_USE_SSE=0 -DBT_NO_SIMD_OPERATOR_OVERLOADS"
+  -DUSE_MSVC_SSE=ON \
+  -DCMAKE_BUILD_TYPE=Release
 
-# --- Step 2: Build Bullet libraries ---
-# Build only the three required libs - BulletSoftBody is not needed and has extra SSE issues
-echo "--- [2/5] Building Bullet libraries (targeted, no SoftBody) ---"
-make -j8 BulletDynamics BulletCollision LinearMath
+# ── Step 2: Build libraries ─────────────────────────────────────────────────
+echo "--- Building Bullet Libraries ---"
+mingw32-make -j8
 
-for lib in \
-  "$BUILD/src/LinearMath/libLinearMath.a" \
-  "$BUILD/src/BulletCollision/libBulletCollision.a" \
-  "$BUILD/src/BulletDynamics/libBulletDynamics.a"; do
-  if [ ! -f "$lib" ]; then
-    echo "ERROR: Expected library not found: $lib"
-    exit 1
-  fi
-done
-echo "  OK: All three Bullet .a libraries confirmed"
-
-# --- Step 3: Compile OpenGL support sources ---
-echo "--- [3/5] Compiling OpenGL support objects ---"
 cd "$REPO_ROOT"
-mkdir -p "$TMP"
 
-COMMON_FLAGS="-std=c++11 -DGL_SILENCE_DEPRECATION -O2 -arch arm64 -I$BT_SRC -I$OGL_SRC"
+# ── Step 3: Compile OpenGL support sources ──────────────────────────────────
+# Windows uses -lopengl32 and -lfreeglut instead of Frameworks
+echo "--- Compiling OpenGL Support ---"
+g++ -std=c++11 -O2 \
+  -I ./bullet-2.82-r2704/src/ \
+  -I ./bullet-2.82-r2704/Demos/OpenGL/ \
+  -c ./bullet-2.82-r2704/Demos/OpenGL/GlutDemoApplication.cpp -o GlutDemoApplication.o
 
-for src in GlutDemoApplication.cpp DemoApplication.cpp GLDebugDrawer.cpp GL_ShapeDrawer.cpp; do
-  echo "  compiling $src ..."
-  g++ $COMMON_FLAGS -c "$OGL_SRC/$src" -o "$TMP/${src%.cpp}.o"
-done
-echo "  OK: OpenGL objects compiled"
+g++ -std=c++11 -O2 \
+  -I ./bullet-2.82-r2704/src/ \
+  -I ./bullet-2.82-r2704/Demos/OpenGL/ \
+  -c ./bullet-2.82-r2704/Demos/OpenGL/GLDebugDrawer.cpp -o GLDebugDrawer.o
 
-# --- Step 4: Link the simulation binary ---
-echo "--- [4/5] Linking c++/app ---"
+g++ -std=c++11 -O2 \
+  -I ./bullet-2.82-r2704/src/ \
+  -I ./bullet-2.82-r2704/Demos/OpenGL/ \
+  -c ./bullet-2.82-r2704/Demos/OpenGL/DemoApplication.cpp -o DemoApplication.o
 
-g++ $COMMON_FLAGS \
-  "$REPO_ROOT/c++/main.cpp" \
-  "$TMP/GlutDemoApplication.o" \
-  "$TMP/DemoApplication.o" \
-  "$TMP/GLDebugDrawer.o" \
-  "$TMP/GL_ShapeDrawer.o" \
-  -L"$BUILD/src/BulletDynamics/" \
-  -L"$BUILD/src/BulletCollision/" \
-  -L"$BUILD/src/LinearMath/" \
+# ── Step 4: Link the simulation binary ─────────────────────────────────────
+echo "--- Linking Final Binary ---"
+g++ -std=c++11 -O2 \
+  c++/main.cpp GlutDemoApplication.o GLDebugDrawer.o DemoApplication.o \
+  -I ./bullet-2.82-r2704/src/ \
+  -I ./bullet-2.82-r2704/Demos/OpenGL/ \
+  -L ./bullet-build/src/BulletDynamics/ \
+  -L ./bullet-build/src/BulletCollision/ \
+  -L ./bullet-build/src/LinearMath/ \
   -lBulletDynamics -lBulletCollision -lLinearMath \
-  -framework OpenGL -framework GLUT \
-  -o "$REPO_ROOT/c++/app"
+  -lfreeglut -lopengl32 -lglu32 -lgdi32 -lwinmm \
+  -o c++/app.exe
 
-# --- Step 5: Verify ---
-echo "--- [5/5] Verifying binary ---"
-chmod +x "$REPO_ROOT/c++/app"
-file "$REPO_ROOT/c++/app"
-echo "--- Build complete ---"
+echo "--- Build Complete: Run c++/app.exe ---"

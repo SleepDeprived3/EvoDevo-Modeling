@@ -1,39 +1,18 @@
 {
-  // .vscode/tasks.json — replaces the broken default C++ build task
-  // Place this file at: EvoDevo-Modeling/.vscode/tasks.json
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Build EvoDevo (M1 arm64)",
-      "type": "shell",
-      "command": "${workspaceFolder}/build_m1.sh",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": "$gcc"
-    },
-    {
-      "label": "Link only (fast rebuild)",
-      "type": "shell",
-      // Skips cmake/make — just re-links after editing main.cpp or NoiseWorld.cpp
-      "command": "bash -c 'set -e; REPO=${workspaceFolder}; BUILD=${REPO}/bullet-build; OGL=${REPO}/bullet-2.82-r2704/Demos/OpenGL; TMP=${BUILD}/_ogl_objs; FLAGS=\"-std=c++11 -DGL_SILENCE_DEPRECATION -O2 -arch arm64 -I${REPO}/bullet-2.82-r2704/src -I${OGL}\"; g++ ${FLAGS} ${REPO}/c++/main.cpp ${TMP}/GlutDemoApplication.o ${TMP}/DemoApplication.o ${TMP}/GLDebugDrawer.o ${TMP}/GL_ShapeDrawer.o -L${BUILD}/src/BulletDynamics -L${BUILD}/src/BulletCollision -L${BUILD}/src/LinearMath -lBulletDynamics -lBulletCollision -lLinearMath -framework OpenGL -framework GLUT -o ${REPO}/c++/app && chmod +x ${REPO}/c++/app && file ${REPO}/c++/app'",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": "$gcc"
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Bullet and App",
+            "type": "shell",
+            "command": "sh ./build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
 }
