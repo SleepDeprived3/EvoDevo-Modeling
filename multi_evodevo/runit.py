@@ -439,8 +439,8 @@ def main():
         make_filled_db()
     pop_num = int(input("What population should be run? "))
     gen_num = int(input("How many generations should be run? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Type one of the following)\n1. Gravity\n2. Error Rate")).lower()
-    if thing_to_test == "gravity":
+    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate")).lower()
+    if thing_to_test == "1":
         rep_er = float(input(
             "What reproduction error condition? "))
         build_er = float(input(
@@ -453,7 +453,7 @@ def main():
         return 0
         
         
-    elif thing_to_test == "error rate":
+    elif thing_to_test == "2":
         rep_cond_start = int(input(
             "Start with which reproduction error condition? "))
         build_cond_start = int(input(

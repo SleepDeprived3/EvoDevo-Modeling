@@ -1,0 +1,1165 @@
+Linking app.exe...
+.\link_only.bat : C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-2
+0.0/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw
+32/bin/ld.exe: main.o: in function `glutInit_ATEXIT_HACK':
+At line:1 char:61
++ ... \Documents\GitHub\EvoDevo-Modeling\c++"; .\link_only.bat 2>&1 | Out-F ...
++                                              ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:/Users/khatch...t_ATEXIT_HACK': 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:620:(.text+0x91): undefined reference to 
+`__imp___glutInitWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `glutCreateWindow_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:622:(.text+0xbb): undefined reference to 
+`__imp___glutCreateWindowWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `glutCreateMenu_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:624:(.text+0xe4): undefined reference to 
+`__imp___glutCreateMenuWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::clientMoveAndDisplay()':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.cpp:421:(.te
+xt+0x2b5f): undefined reference to `__imp_glutSwapBuffers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::ParseCmdLine(char*)':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.cpp:443:(.te
+xt+0x2d38): undefined reference to `__imp_glutSwapBuffers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `btSphereShape::btSphereShape(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionShapes/btSphereShape.h:29:(.text$_ZN13btSphereShapeC1E
+f[_ZN13btSphereShapeC1Ef]+0x19): undefined reference to 
+`btConvexInternalShape::btConvexInternalShape()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `btHingeConstraint::setLimit(float, float, float, float, 
+float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/ConstraintSolver/btHingeConstraint.h:185:(.text$_ZN17btHingeCons
+traint8setLimitEfffff[_ZN17btHingeConstraint8setLimitEfffff]+0x4e): undefined 
+reference to `btAngularLimit::set(float, float, float, float, float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::CreateGround(int)':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.h:264:(.text
+$_ZN10NoiseWorld12CreateGroundEi[_ZN10NoiseWorld12CreateGroundEi]+0x7c): 
+undefined reference to `btStaticPlaneShape::btStaticPlaneShape(btVector3 
+const&, float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::CreateSphere(int, float, float, float, 
+float)':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.h:300:(.text
+$_ZN10NoiseWorld12CreateSphereEiffff[_ZN10NoiseWorld12CreateSphereEiffff]+0x291
+): undefined reference to 
+`btRigidBody::btRigidBody(btRigidBody::btRigidBodyConstructionInfo const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::CreateHinge(int, int, int, float, float, 
+float, float, float, float, float, float, bool)':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.h:338:(.text
+$_ZN10NoiseWorld11CreateHingeEiiiffffffffb[_ZN10NoiseWorld11CreateHingeEiiiffff
+ffffb]+0x151): undefined reference to 
+`btHingeConstraint::btHingeConstraint(btRigidBody&, btRigidBody&, btVector3 
+const&, btVector3 const&, btVector3 const&, btVector3 const&, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o: in function `NoiseWorld::ActuateJoint(int, float, float)':
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/./NoiseWorld.h:351:(.text
+$_ZN10NoiseWorld12ActuateJointEiff[_ZN10NoiseWorld12ActuateJointEiff]+0x6d): 
+undefined reference to `btHingeConstraint::setMotorTarget(float, float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+main.o:main.cpp:(.rdata$_ZTV10NoiseWorld[_ZTV10NoiseWorld]+0xa8): undefined 
+reference to `NoiseWorld::displayCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: mai
+n.o:main.cpp:(.rdata$_ZTV17btTypedConstraint[_ZTV17btTypedConstraint]+0x60): 
+undefined reference to `btTypedConstraint::serialize(void*, btSerializer*) 
+const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: mai
+n.o:main.cpp:(.rdata$.refptr.gContactProcessedCallback[.refptr.gContactProcesse
+dCallback]+0x0): undefined reference to `gContactProcessedCallback'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: mai
+n.o:main.cpp:(.rdata$.refptr._ZTV13btSphereShape[.refptr._ZTV13btSphereShape]+0
+x0): undefined reference to `vtable for btSphereShape'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `glutInit_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:620:(.text+0x28): undefined reference to 
+`__imp___glutInitWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `glutCreateWindow_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:622:(.text+0x52): undefined reference to 
+`__imp___glutCreateWindowWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `glutCreateMenu_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:624:(.text+0x7b): undefined reference to 
+`__imp___glutCreateMenuWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::DemoApplication()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:91:(.text+0xb3): undefined reference to 
+`btClock::btClock()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:100:(.text+0x3e4): undefined reference to 
+`btClock::~btClock()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::~DemoApplication()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:115:(.text+0x48c): undefined reference to 
+`btClock::~btClock()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::reshape(int, int)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:297:(.text+0x1280): undefined reference to 
+`GLDebugResetFont(int, int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::keyboardCallback(unsigned 
+char, int, int)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:319:(.text+0x132d): undefined reference to 
+`CProfileIterator::Enter_Child(int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:323:(.text+0x1343): undefined reference to 
+`CProfileIterator::Enter_Parent()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::setShootBoxShape()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:556:(.text+0x1eb6): undefined reference to 
+`btBoxShape::btBoxShape(btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::pickObject(btVector3 const&, 
+btCollisionObject const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:825:(.text+0x2d96): undefined reference to 
+`btGeneric6DofConstraint::btGeneric6DofConstraint(btRigidBody&, btTransform 
+const&, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:849:(.text+0x31d5): undefined reference to 
+`btPoint2PointConstraint::btPoint2PointConstraint(btRigidBody&, btVector3 
+const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::localCreateRigidBody(float, 
+btTransform const&, btCollisionShape*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:1028:(.text+0x3bc7): undefined reference to 
+`btRigidBody::btRigidBody(btRigidBody::btRigidBodyConstructionInfo const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::displayProfileString(int, 
+int, char*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:1083:(.text+0x3dd9): undefined reference to 
+`GLDebugDrawString(int, int, char const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::showProfileInfo(int&, int&, 
+int)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:1094:(.text+0x3e2e): undefined reference to 
+`CProfileManager::Get_Time_Since_Reset()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:1107:(.text+0x3e5e): undefined reference to 
+`CProfileIterator::First()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:1124:(.text+0x40cd): undefined reference to 
+`CProfileIterator::Next()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/DemoApplication.cpp:1124:(.text+0x40e0): undefined reference to 
+`CProfileIterator::Is_Done()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `DemoApplication::clientResetScene()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/DemoApplication.cpp:1378:(.text+0x4f32): undefined reference to 
+`btRigidBody::setCenterOfMassTransform(btTransform const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+DemoApplication.o: in function `CProfileManager::Get_Iterator()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+LinearMath/btQuickprof.h:159:(.text$_ZN15CProfileManager12Get_IteratorEv[_ZN15C
+ProfileManager12Get_IteratorEv]+0x2d): undefined reference to 
+`CProfileIterator::CProfileIterator(CProfileNode*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr.gNumGjkChecks[.refptr.gNumGj
+kChecks]+0x0): undefined reference to `gNumGjkChecks'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr.gNumDeepPenetrationChecks[.r
+efptr.gNumDeepPenetrationChecks]+0x0): undefined reference to 
+`gNumDeepPenetrationChecks'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr.gDisableDeactivation[.refptr
+.gDisableDeactivation]+0x0): undefined reference to `gDisableDeactivation'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr.sBulletDNAstr64[.refptr.sBul
+letDNAstr64]+0x0): undefined reference to `sBulletDNAstr64'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr.sBulletDNAlen64[.refptr.sBul
+letDNAlen64]+0x0): undefined reference to `sBulletDNAlen64'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr._ZN15CProfileManager4RootE[.
+refptr._ZN15CProfileManager4RootE]+0x0): undefined reference to 
+`CProfileManager::Root'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: Dem
+oApplication.o:DemoApplication.cpp:(.rdata$.refptr._ZN15CProfileManager12FrameC
+ounterE[.refptr._ZN15CProfileManager12FrameCounterE]+0x0): undefined reference 
+to `CProfileManager::FrameCounter'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `glutInit_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:620:(.text+0x28): undefined reference to 
+`__imp___glutInitWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `glutCreateWindow_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:622:(.text+0x52): undefined reference to 
+`__imp___glutCreateWindowWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `glutCreateMenu_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:624:(.text+0x7b): undefined reference to 
+`__imp___glutCreateMenuWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `GlutDemoApplication::updateModifierKeys()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GlutDemoApplication.cpp:14:(.text+0xa2): undefined reference to 
+`__imp_glutGetModifiers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutDemoApplication.cpp:17:(.text+0xcb): undefined reference to 
+`__imp_glutGetModifiers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutDemoApplication.cpp:20:(.text+0xf3): undefined reference to 
+`__imp_glutGetModifiers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `GlutDemoApplication::specialKeyboard(int, 
+int, int)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GlutDemoApplication.cpp:75:(.text+0x33e): undefined reference to 
+`__imp_glutPostRedisplay'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutDemoApplication.o: in function `GlutDemoApplication::swapBuffers()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GlutDemoApplication.cpp:81:(.text+0x35b): undefined reference to 
+`__imp_glutSwapBuffers'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutStuff.o: in function `glutInit_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:620:(.text+0x28): undefined reference to 
+`__imp___glutInitWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutStuff.o: in function `glutCreateWindow_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:622:(.text+0x52): undefined reference to 
+`__imp___glutCreateWindowWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutStuff.o: in function `glutCreateMenu_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:624:(.text+0x7b): undefined reference to 
+`__imp___glutCreateMenuWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GlutStuff.o: in function `glutmain(int, char**, int, int, char const*, 
+DemoApplication*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GlutStuff.cpp:80:(.text+0x2fb): undefined reference to 
+`__imp_glutInitDisplayMode'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:81:(.text+0x322): undefined reference to 
+`__imp_glutInitWindowPosition'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:82:(.text+0x333): undefined reference to 
+`__imp_glutInitWindowSize'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:90:(.text+0x36f): undefined reference to 
+`__imp_glutKeyboardFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:91:(.text+0x382): undefined reference to 
+`__imp_glutKeyboardUpFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:92:(.text+0x395): undefined reference to 
+`__imp_glutSpecialFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:93:(.text+0x3a8): undefined reference to 
+`__imp_glutSpecialUpFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:95:(.text+0x3bb): undefined reference to 
+`__imp_glutReshapeFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:97:(.text+0x3ce): undefined reference to 
+`__imp_glutIdleFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:98:(.text+0x3e1): undefined reference to 
+`__imp_glutMouseFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:99:(.text+0x3f4): undefined reference to 
+`__imp_glutPassiveMotionFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:100:(.text+0x407): undefined reference to 
+`__imp_glutMotionFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:101:(.text+0x41a): undefined reference to 
+`__imp_glutDisplayFunc'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GlutStuff.cpp:115:(.text+0x428): undefined reference to 
+`__imp_glutMainLoop'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `glutInit_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:620:(.text+0x28): undefined reference to 
+`__imp___glutInitWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `glutCreateWindow_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:622:(.text+0x52): undefined reference to 
+`__imp___glutCreateWindowWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `glutCreateMenu_ATEXIT_HACK':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/./more_libs/include/GL/fr
+eeglut_std.h:624:(.text+0x7b): undefined reference to 
+`__imp___glutCreateMenuWithExit'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `GL_ShapeDrawer::cache(btConvexShape*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GL_ShapeDrawer.cpp:354:(.text+0x740): undefined reference to 
+`btShapeHull::buildHull(float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GL_ShapeDrawer.cpp:358:(.text+0x776): undefined reference to 
+`btShapeHull::numIndices() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GL_ShapeDrawer.cpp:359:(.text+0x788): undefined reference to 
+`btShapeHull::numVertices() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `GL_ShapeDrawer::drawOpenGL(float*, 
+btCollisionShape const*, btVector3 const&, int, btVector3 const&, btVector3 
+const&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GL_ShapeDrawer.cpp:767:(.text+0x2cc0): undefined reference to 
+`btShapeHull::numTriangles() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GL_ShapeDrawer.cpp:775:(.text+0x2ffc): undefined reference to 
+`btShapeHull::numTriangles() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function 
+`GL_ShapeDrawer::ShapeCache::ShapeCache(btConvexShape*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GL_ShapeDrawer.h:32:(.text$_ZN14GL_ShapeDrawer10ShapeCacheC1EP13btConv
+exShape[_ZN14GL_ShapeDrawer10ShapeCacheC1EP13btConvexShape]+0x1f): undefined 
+reference to `btShapeHull::btShapeHull(btConvexShape const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demos/O
+penGL/GL_ShapeDrawer.h:32:(.text$_ZN14GL_ShapeDrawer10ShapeCacheC1EP13btConvexS
+hape[_ZN14GL_ShapeDrawer10ShapeCacheC1EP13btConvexShape]+0x40): undefined 
+reference to `btShapeHull::~btShapeHull()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function 
+`btConvexInternalShape::~btConvexInternalShape()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionShapes/btConvexInternalShape.h:52:(.text$_ZN21btConvex
+InternalShapeD2Ev[_ZN21btConvexInternalShapeD2Ev]+0x26): undefined reference 
+to `btConvexShape::~btConvexShape()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `GlDrawcallback::~GlDrawcallback()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GL_ShapeDrawer.cpp:202:(.text$_ZN14GlDrawcallbackD1Ev[_ZN14GlDrawcallb
+ackD1Ev]+0x22): undefined reference to 
+`btTriangleCallback::~btTriangleCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+GL_ShapeDrawer.o: in function `GL_ShapeDrawer::ShapeCache::~ShapeCache()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/Demo
+s/OpenGL/GL_ShapeDrawer.h:29:(.text$_ZN14GL_ShapeDrawer10ShapeCacheD1Ev[_ZN14GL
+_ShapeDrawer10ShapeCacheD1Ev]+0x24): undefined reference to 
+`btShapeHull::~btShapeHull()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: GL_
+ShapeDrawer.o:GL_ShapeDrawer:(.rdata$.refptr._ZTV18btTriangleCallback[.refptr._
+ZTV18btTriangleCallback]+0x0): undefined reference to `vtable for 
+btTriangleCallback'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: GL_
+ShapeDrawer.o:GL_ShapeDrawer:(.rdata$.refptr._ZTV21btConvexInternalShape[.refpt
+r._ZTV21btConvexInternalShape]+0x0): undefined reference to `vtable for 
+btConvexInternalShape'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btAxisSweep3.o: in function `btAxisSweep3Internal<unsigned 
+short>::btAxisSweep3Internal(btVector3 const&, btVector3 const&, unsigned 
+short, unsigned short, unsigned short, btOverlappingPairCache*, bool)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/BroadphaseCollision/btAxisSweep3.h:366:(.text$_ZN20btAxisSweep3
+InternalItEC2ERK9btVector3S3_tttP22btOverlappingPairCacheb[_ZN20btAxisSweep3Int
+ernalItEC2ERK9btVector3S3_tttP22btOverlappingPairCacheb]+0x131): undefined 
+reference to `btHashedOverlappingPairCache::btHashedOverlappingPairCache()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/BroadphaseCollision/btAxisSweep3.h:373:(.text$_ZN20btAxisSweep3Int
+ernalItEC2ERK9btVector3S3_tttP22btOverlappingPairCacheb[_ZN20btAxisSweep3Intern
+alItEC2ERK9btVector3S3_tttP22btOverlappingPairCacheb]+0x209): undefined 
+reference to `btDbvtBroadphase::btDbvtBroadphase(btOverlappingPairCache*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btAxisSweep3.o: in function `btAxisSweep3Internal<unsigned 
+int>::btAxisSweep3Internal(btVector3 const&, btVector3 const&, unsigned int, 
+unsigned int, unsigned int, btOverlappingPairCache*, bool)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/BroadphaseCollision/btAxisSweep3.h:366:(.text$_ZN20btAxisSweep3
+InternalIjEC2ERK9btVector3S3_jjjP22btOverlappingPairCacheb[_ZN20btAxisSweep3Int
+ernalIjEC2ERK9btVector3S3_jjjP22btOverlappingPairCacheb]+0x119): undefined 
+reference to `btHashedOverlappingPairCache::btHashedOverlappingPairCache()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/BroadphaseCollision/btAxisSweep3.h:373:(.text$_ZN20btAxisSweep3Int
+ernalIjEC2ERK9btVector3S3_jjjP22btOverlappingPairCacheb[_ZN20btAxisSweep3Intern
+alIjEC2ERK9btVector3S3_jjjP22btOverlappingPairCacheb]+0x1f1): undefined 
+reference to `btDbvtBroadphase::btDbvtBroadphase(btOverlappingPairCache*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btA
+xisSweep3.o:btAxisSweep3.c:(.rdata$.refptr.gOverlappingPairs[.refptr.gOverlappi
+ngPairs]+0x0): undefined reference to `gOverlappingPairs'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btDefaultCollisionConfiguration
+::btDefaultCollisionConfiguration(btDefaultCollisionConstructionInfo const&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.cpp:62:(.text
++0x168): undefined reference to 
+`btConvexConvexAlgorithm::CreateFunc::CreateFunc(btVoronoiSimplexSolver*, 
+btConvexPenetrationDepthSolver*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btEmptyAlgorithm::CreateFunc::C
+reateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.h:48:(.text$_ZN16bt
+EmptyAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionAlgorithmCon
+structionInfoPK24btCollisionObjectWrapperS5_[_ZN16btEmptyAlgorithm10CreateFunc2
+4CreateCollisionAlgorithmER36btCollisionAlgorithmConstructionInfoPK24btCollisio
+nObjectWrapperS5_]+0x6b): undefined reference to 
+`btEmptyAlgorithm::btEmptyAlgorithm(btCollisionAlgorithmConstructionInfo 
+const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btConvexConcaveCollisionAlgorit
+hm::CreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&,
+ btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h:106:(.tex
+t$_ZN33btConvexConcaveCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmE
+R36btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN33btC
+onvexConcaveCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btColli
+sionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x81): undefined 
+reference to `btConvexConcaveCollisionAlgorithm::btConvexConcaveCollisionAlgori
+thm(btCollisionAlgorithmConstructionInfo const&, btCollisionObjectWrapper 
+const*, btCollisionObjectWrapper const*, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btConvexConcaveCollisionAlgorit
+hm::SwappedCreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructio
+nInfo&, btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.h:115:(.tex
+t$_ZN33btConvexConcaveCollisionAlgorithm17SwappedCreateFunc24CreateCollisionAlg
+orithmER36btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_
+ZN33btConvexConcaveCollisionAlgorithm17SwappedCreateFunc24CreateCollisionAlgori
+thmER36btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x8
+1): undefined reference to `btConvexConcaveCollisionAlgorithm::btConvexConcaveC
+ollisionAlgorithm(btCollisionAlgorithmConstructionInfo const&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btCompoundCollisionAlgorithm::C
+reateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h:84:(.text$_ZN2
+8btCompoundCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollis
+ionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN28btCompoundColl
+isionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionAlgorithmCon
+structionInfoPK24btCollisionObjectWrapperS5_]+0x81): undefined reference to `bt
+CompoundCollisionAlgorithm::btCompoundCollisionAlgorithm(btCollisionAlgorithmCo
+nstructionInfo const&, btCollisionObjectWrapper const*, 
+btCollisionObjectWrapper const*, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btCompoundCollisionAlgorithm::S
+wappedCreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo
+&, btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.h:93:(.text$_ZN2
+8btCompoundCollisionAlgorithm17SwappedCreateFunc24CreateCollisionAlgorithmER36b
+tCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN28btCompo
+undCollisionAlgorithm17SwappedCreateFunc24CreateCollisionAlgorithmER36btCollisi
+onAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x81): undefined 
+reference to `btCompoundCollisionAlgorithm::btCompoundCollisionAlgorithm(btColl
+isionAlgorithmConstructionInfo const&, btCollisionObjectWrapper const*, 
+btCollisionObjectWrapper const*, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btCompoundCompoundCollisionAlgo
+rithm::CreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInf
+o&, btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCompoundCompoundCollisionAlgorithm.h:75:(.t
+ext$_ZN36btCompoundCompoundCollisionAlgorithm10CreateFunc24CreateCollisionAlgor
+ithmER36btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN
+36btCompoundCompoundCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER3
+6btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x81): 
+undefined reference to `btCompoundCompoundCollisionAlgorithm::btCompoundCompoun
+dCollisionAlgorithm(btCollisionAlgorithmConstructionInfo const&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*, bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btConvexPlaneCollisionAlgorithm
+::CreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h:73:(.text$_
+ZN31btConvexPlaneCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36bt
+CollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN31btConvex
+PlaneCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionAlg
+orithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0xad): undefined 
+reference to `btConvexPlaneCollisionAlgorithm::btConvexPlaneCollisionAlgorithm(
+btPersistentManifold*, btCollisionAlgorithmConstructionInfo const&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*, bool, int, 
+int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.h:76:(.text$_ZN3
+1btConvexPlaneCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCol
+lisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN31btConvexPla
+neCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionAlgori
+thmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x11f): undefined 
+reference to `btConvexPlaneCollisionAlgorithm::btConvexPlaneCollisionAlgorithm(
+btPersistentManifold*, btCollisionAlgorithmConstructionInfo const&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*, bool, int, 
+int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btBoxBoxCollisionAlgorithm::Cre
+ateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.h:59:(.text$_ZN26b
+tBoxBoxCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionA
+lgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN26btBoxBoxCollisionA
+lgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollisionAlgorithmConstruct
+ionInfoPK24btCollisionObjectWrapperS5_]+0x85): undefined reference to 
+`btBoxBoxCollisionAlgorithm::btBoxBoxCollisionAlgorithm(btPersistentManifold*, 
+btCollisionAlgorithmConstructionInfo const&, btCollisionObjectWrapper const*, 
+btCollisionObjectWrapper const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btSphereSphereCollisionAlgorith
+m::CreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h:59:(.text$
+_ZN32btSphereSphereCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36
+btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN32btSphe
+reSphereCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCollision
+AlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x80): undefined 
+reference to `btSphereSphereCollisionAlgorithm::btSphereSphereCollisionAlgorith
+m(btPersistentManifold*, btCollisionAlgorithmConstructionInfo const&, 
+btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDefaultCollisionConfiguration.o: in function `btSphereTriangleCollisionAlgori
+thm::CreateFunc::CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo&
+, btCollisionObjectWrapper const*, btCollisionObjectWrapper const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.h:62:(.tex
+t$_ZN34btSphereTriangleCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithm
+ER36btCollisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_[_ZN34bt
+SphereTriangleCollisionAlgorithm10CreateFunc24CreateCollisionAlgorithmER36btCol
+lisionAlgorithmConstructionInfoPK24btCollisionObjectWrapperS5_]+0x95): 
+undefined reference to `btSphereTriangleCollisionAlgorithm::btSphereTriangleCol
+lisionAlgorithm(btPersistentManifold*, btCollisionAlgorithmConstructionInfo 
+const&, btCollisionObjectWrapper const*, btCollisionObjectWrapper const*, 
+bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btD
+efaultCollisionConfiguration.o:btDefaultCollisionConfiguration.cpp:(.rdata$.ref
+ptr._ZTV33btMinkowskiPenetrationDepthSolver[.refptr._ZTV33btMinkowskiPenetratio
+nDepthSolver]+0x0): undefined reference to `vtable for 
+btMinkowskiPenetrationDepthSolver'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btD
+efaultCollisionConfiguration.o:btDefaultCollisionConfiguration.cpp:(.rdata$.ref
+ptr._ZTV30btGjkEpaPenetrationDepthSolver[.refptr._ZTV30btGjkEpaPenetrationDepth
+Solver]+0x0): undefined reference to `vtable for 
+btGjkEpaPenetrationDepthSolver'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionDispatcher.o: in function 
+`btCollisionDispatcher::btCollisionDispatcher(btCollisionConfiguration*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp:59:(.text+0x16c): 
+undefined reference to `btDispatcher::~btDispatcher()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionDispatcher.o: in function 
+`btCollisionDispatcher::~btCollisionDispatcher()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp:69:(.text+0x20a): 
+undefined reference to `btDispatcher::~btDispatcher()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionDispatcher.o: in function 
+`btCollisionDispatcher::defaultNearCallback(btBroadphasePair&, 
+btCollisionDispatcher&, btDispatcherInfo const&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionDispatcher.cpp:273:(.text+0x8f2): 
+undefined reference to 
+`btManifoldResult::btManifoldResult(btCollisionObjectWrapper const*, 
+btCollisionObjectWrapper const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionDispatcher.o: in function `btPersistentManifold::clearManifold()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btPersistentManifold.h:226:(.text$_ZN20btP
+ersistentManifold13clearManifoldEv[_ZN20btPersistentManifold13clearManifoldEv]+
+0x3b): undefined reference to 
+`btPersistentManifold::clearUserCache(btManifoldPoint&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionDispatcher.o:btCollisionDispatcher.cpp:(.rdata$.refptr.gContactBreaking
+Threshold[.refptr.gContactBreakingThreshold]+0x0): undefined reference to 
+`gContactBreakingThreshold'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionDispatcher.o:btCollisionDispatcher.cpp:(.rdata$.refptr._ZTV12btDispatch
+er[.refptr._ZTV12btDispatcher]+0x0): undefined reference to `vtable for 
+btDispatcher'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionDispatcher.o:btCollisionDispatcher.cpp:(.rdata$.refptr._ZTV16btManifold
+Result[.refptr._ZTV16btManifoldResult]+0x0): undefined reference to `vtable 
+for btManifoldResult'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `BridgeTriangleRaycastCallback':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:351:(.text+0x9e0): 
+undefined reference to 
+`btTriangleRaycastCallback::btTriangleRaycastCallback(btVector3 const&, 
+btVector3 const&, unsigned int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:424:(.text+0xb70): 
+undefined reference to 
+`btTriangleRaycastCallback::btTriangleRaycastCallback(btVector3 const&, 
+btVector3 const&, unsigned int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btCollisionWorld::rayTestSingleInternal(btTransform const&, btTransform 
+const&, btCollisionObjectWrapper const*, 
+btCollisionWorld::RayResultCallback&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:290:(.text+0x1191): 
+undefined reference to 
+`btSubsimplexConvexCast::btSubsimplexConvexCast(btConvexShape const*, 
+btConvexShape const*, btVoronoiSimplexSolver*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:292:(.text+0x11b8): 
+undefined reference to `btGjkConvexCast::btGjkConvexCast(btConvexShape const*, 
+btConvexShape const*, btVoronoiSimplexSolver*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:388:(.text+0x147c): 
+undefined reference to 
+`btBvhTriangleMeshShape::performRaycast(btTriangleCallback*, btVector3 const&, 
+btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `BridgeTriangleConvexcastCallback':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:661:(.text+0x1a5e): 
+undefined reference to 
+`btTriangleConvexcastCallback::btTriangleConvexcastCallback(btConvexShape 
+const*, btTransform const&, btTransform const&, btTransform const&, float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:753:(.text+0x1c16): 
+undefined reference to 
+`btTriangleConvexcastCallback::btTriangleConvexcastCallback(btConvexShape 
+const*, btTransform const&, btTransform const&, btTransform const&, float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btCollisionWorld::objectQuerySingleInternal(btConvexShape const*, btTransform 
+const&, btTransform const&, btCollisionObjectWrapper const*, 
+btCollisionWorld::ConvexResultCallback&, float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:605:(.text+0x1ff2): 
+undefined reference to 
+`btContinuousConvexCollision::btContinuousConvexCollision(btConvexShape 
+const*, btConvexShape const*, btVoronoiSimplexSolver*, 
+btConvexPenetrationDepthSolver*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:696:(.text+0x23b0): 
+undefined reference to 
+`btBvhTriangleMeshShape::performConvexcast(btTriangleCallback*, btVector3 
+const&, btVector3 const&, btVector3 const&, btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:705:(.text+0x243f): 
+undefined reference to 
+`btContinuousConvexCollision::btContinuousConvexCollision(btConvexShape 
+const*, btStaticPlaneShape const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btCollisionWorld::convexSweepTest(btConvexShape const*, btTransform const&, 
+btTransform const&, btCollisionWorld::ConvexResultCallback&, float) const':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:1030:(.text+0x2e33): 
+undefined reference to `btCollisionShape::calculateTemporalAabb(btTransform 
+const&, btVector3 const&, btVector3 const&, float, btVector3&, btVector3&) 
+const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o:btCollisionWorld.cpp:(.rdata+0x1d8): undefined reference to 
+`btTriangleConvexcastCallback::processTriangle(btVector3*, int, int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o:btCollisionWorld.cpp:(.rdata+0x208): undefined reference to 
+`btTriangleConvexcastCallback::processTriangle(btVector3*, int, int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o:btCollisionWorld.cpp:(.rdata+0x2b0): undefined reference to 
+`btTriangleRaycastCallback::processTriangle(btVector3*, int, int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o:btCollisionWorld.cpp:(.rdata+0x2e0): undefined reference to 
+`btTriangleRaycastCallback::processTriangle(btVector3*, int, int)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `CProfileSample::CProfileSample(char const*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+LinearMath/btQuickprof.h:181:(.text$_ZN14CProfileSampleC1EPKc[_ZN14CProfileSamp
+leC1EPKc]+0x18): undefined reference to `CProfileManager::Start_Profile(char 
+const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `CProfileSample::~CProfileSample()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+LinearMath/btQuickprof.h:186:(.text$_ZN14CProfileSampleD1Ev[_ZN14CProfileSample
+D1Ev]+0xd): undefined reference to `CProfileManager::Stop_Profile()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btSubsimplexConvexCast::~btSubsimplexConvexCast()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h:28:(.text$_ZN22bt
+SubsimplexConvexCastD1Ev[_ZN22btSubsimplexConvexCastD1Ev]+0x26): undefined 
+reference to `btConvexCast::~btConvexCast()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `btGjkConvexCast::~btGjkConvexCast()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h:30:(.text$_ZN15btGjkConv
+exCastD1Ev[_ZN15btGjkConvexCastD1Ev]+0x26): undefined reference to 
+`btConvexCast::~btConvexCast()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btTriangleRaycastCallback::~btTriangleRaycastCallback()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btRaycastCallback.h:24:(.text$_ZN25btTrian
+gleRaycastCallbackD2Ev[_ZN25btTriangleRaycastCallbackD2Ev]+0x26): undefined 
+reference to `btTriangleCallback::~btTriangleCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btContinuousConvexCollision::~btContinuousConvexCollision()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.h:30:(.text$_Z
+N27btContinuousConvexCollisionD1Ev[_ZN27btContinuousConvexCollisionD1Ev]+0x26):
+ undefined reference to `btConvexCast::~btConvexCast()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btTriangleConvexcastCallback::~btTriangleConvexcastCallback()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/NarrowPhaseCollision/btRaycastCallback.h:53:(.text$_ZN28btTrian
+gleConvexcastCallbackD2Ev[_ZN28btTriangleConvexcastCallbackD2Ev]+0x26): 
+undefined reference to `btTriangleCallback::~btTriangleCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function 
+`btBridgedManifoldResult::btBridgedManifoldResult(btCollisionObjectWrapper 
+const*, btCollisionObjectWrapper const*, 
+btCollisionWorld::ContactResultCallback&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:1077:(.text$_ZN23btBridg
+edManifoldResultC1EPK24btCollisionObjectWrapperS2_RN16btCollisionWorld21Contact
+ResultCallbackE[_ZN23btBridgedManifoldResultC1EPK24btCollisionObjectWrapperS2_R
+N16btCollisionWorld21ContactResultCallbackE]+0x2b): undefined reference to 
+`btManifoldResult::btManifoldResult(btCollisionObjectWrapper const*, 
+btCollisionObjectWrapper const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btCollisionWorld.o: in function `DebugDrawcallback::~DebugDrawcallback()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletCollision/CollisionDispatch/btCollisionWorld.cpp:1206:(.text$_ZN17DebugDr
+awcallbackD1Ev[_ZN17DebugDrawcallbackD1Ev]+0x35): undefined reference to 
+`btInternalTriangleIndexCallback::~btInternalTriangleIndexCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letCollision/CollisionDispatch/btCollisionWorld.cpp:1206:(.text$_ZN17DebugDrawc
+allbackD1Ev[_ZN17DebugDrawcallbackD1Ev]+0x41): undefined reference to 
+`btTriangleCallback::~btTriangleCallback()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV31btInternalTriangleIn
+dexCallback[.refptr._ZTV31btInternalTriangleIndexCallback]+0x0): undefined 
+reference to `vtable for btInternalTriangleIndexCallback'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV28btTriangleConvexcast
+Callback[.refptr._ZTV28btTriangleConvexcastCallback]+0x0): undefined reference 
+to `vtable for btTriangleConvexcastCallback'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV27btContinuousConvexCo
+llision[.refptr._ZTV27btContinuousConvexCollision]+0x0): undefined reference 
+to `vtable for btContinuousConvexCollision'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV25btTriangleRaycastCal
+lback[.refptr._ZTV25btTriangleRaycastCallback]+0x0): undefined reference to 
+`vtable for btTriangleRaycastCallback'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV15btGjkConvexCast[.ref
+ptr._ZTV15btGjkConvexCast]+0x0): undefined reference to `vtable for 
+btGjkConvexCast'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btC
+ollisionWorld.o:btCollisionWorld.cpp:(.rdata$.refptr._ZTV22btSubsimplexConvexCa
+st[.refptr._ZTV22btSubsimplexConvexCast]+0x0): undefined reference to `vtable 
+for btSubsimplexConvexCast'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::btDiscreteDynamicsWorld(btDispatcher*, 
+btBroadphaseInterface*, btConstraintSolver*, btCollisionConfiguration*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:228:(.text+0x204): 
+undefined reference to `btSimulationIslandManager::btSimulationIslandManager()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::saveKinematicState(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:275:(.text+0x595): 
+undefined reference to `btRigidBody::saveKinematicState(float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::applyGravity()':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:343:(.text+0x89f): 
+undefined reference to `btRigidBody::applyGravity()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::stepSimulation(float, int, float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:464:(.text+0xdcd): 
+undefined reference to `CProfileManager::Increment_Frame_Counter()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::setGravity(btVector3 const&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:528:(.text+0x1081): 
+undefined reference to `btRigidBody::setGravity(btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::addRigidBody(btRigidBody*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:563:(.text+0x1219): 
+undefined reference to `btRigidBody::setGravity(btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::addRigidBody(btRigidBody*, short, short)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:588:(.text+0x136d): 
+undefined reference to `btRigidBody::setGravity(btVector3 const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::addConstraint(btTypedConstraint*, bool)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:658:(.text+0x16fc): 
+undefined reference to `btRigidBody::addConstraintRef(btTypedConstraint*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:659:(.text+0x1717): undefined 
+reference to `btRigidBody::addConstraintRef(btTypedConstraint*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::removeConstraint(btTypedConstraint*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:666:(.text+0x1760): 
+undefined reference to `btRigidBody::removeConstraintRef(btTypedConstraint*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:667:(.text+0x177b): undefined 
+reference to `btRigidBody::removeConstraintRef(btTypedConstraint*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::solveConstraints(btContactSolverInfo&)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:727:(.text+0x1ad0): 
+undefined reference to 
+`btSimulationIslandManager::buildAndProcessIslands(btDispatcher*, 
+btCollisionWorld*, btSimulationIslandManager::IslandCallback*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::createPredictiveContacts(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:898:(.text+0x1fba): 
+undefined reference to `btRigidBody::predictIntegratedTransform(float, 
+btTransform&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:957:(.text+0x247f): undefined 
+reference to `btPersistentManifold::addManifoldPoint(btManifoldPoint const&, 
+bool)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:960:(.text+0x24c7): undefined 
+reference to `btManifoldResult::calculateCombinedFriction(btCollisionObject 
+const*, btCollisionObject const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::integrateTransforms(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:982:(.text+0x26eb): 
+undefined reference to `btRigidBody::predictIntegratedTransform(float, 
+btTransform&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1032:(.text+0x29ef): 
+undefined reference to `btRigidBody::predictIntegratedTransform(float, 
+btTransform&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1034:(.text+0x2a18): 
+undefined reference to `btRigidBody::proceedToTransform(btTransform const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1070:(.text+0x2a88): 
+undefined reference to `btRigidBody::proceedToTransform(btTransform const&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1089:(.text+0x2b92): 
+undefined reference to 
+`btManifoldResult::calculateCombinedRestitution(btCollisionObject const*, 
+btCollisionObject const*)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::predictUnconstraintMotion(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1128:(.text+0x2e8b): 
+undefined reference to `btRigidBody::applyDamping(float)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1130:(.text+0x2eae): 
+undefined reference to `btRigidBody::predictIntegratedTransform(float, 
+btTransform&)'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::startProfiling(float)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1141:(.text+0x2f18): 
+undefined reference to `CProfileManager::Reset()'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function 
+`btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1221:(.text+0x36c7): 
+undefined reference to `btConeTwistConstraint::GetPointForAngle(float, float) 
+const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1226:(.text+0x3764): 
+undefined reference to `btConeTwistConstraint::GetPointForAngle(float, float) 
+const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1274:(.text+0x3efa): 
+undefined reference to `btGeneric6DofConstraint::getAngle(int) const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\
+Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/Bul
+letDynamics/Dynamics/btDiscreteDynamicsWorld.cpp:1275:(.text+0x3f18): 
+undefined reference to `btGeneric6DofConstraint::getAngle(int) const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function `btHingeConstraint::getLowerLimit() 
+const':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/ConstraintSolver/btHingeConstraint.h:223:(.text$_ZNK17btHingeCon
+straint13getLowerLimitEv[_ZNK17btHingeConstraint13getLowerLimitEv]+0x1a): 
+undefined reference to `btAngularLimit::getLow() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btDiscreteDynamicsWorld.o: in function `btHingeConstraint::getUpperLimit() 
+const':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/ConstraintSolver/btHingeConstraint.h:232:(.text$_ZNK17btHingeCon
+straint13getUpperLimitEv[_ZNK17btHingeConstraint13getUpperLimitEv]+0x1a): 
+undefined reference to `btAngularLimit::getHigh() const'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: btD
+iscreteDynamicsWorld.o:btDiscreteDynamicsWorld.cpp:(.rdata$.refptr.gDeactivatio
+nTime[.refptr.gDeactivationTime]+0x0): undefined reference to 
+`gDeactivationTime'
+C:/Users/khatch/Documents/GitHub/EvoDevo-Modeling/c++/mingw-20.0/MinGW/bin/../l
+ib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+btSequentialImpulseConstraintSolver.o: in function `btSequentialImpulseConstrai
+ntSolver::solveGroupCacheFriendlySetup(btCollisionObject**, int, 
+btPersistentManifold**, int, btTypedConstraint**, int, btContactSolverInfo 
+const&, btIDebugDraw*)':
+C:\Users\khatch\Documents\GitHub\EvoDevo-Modeling\c++/../bullet-2.82-r2704/src/
+BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp:1093:(.
+text+0x4aa6): undefined reference to 
+`btRigidBody::computeGyroscopicForce(float) const'
+collect2.exe: error: ld returned 1 exit status
+FAILED with error code 1

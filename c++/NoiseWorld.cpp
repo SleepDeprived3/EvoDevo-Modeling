@@ -464,6 +464,11 @@ void NoiseWorld::keyboardCallback(unsigned char key, int x, int y)
     }
 }
 
+void NoiseWorld::displayCallback()
+{
+	clientMoveAndDisplay();
+}
+
 
 // =================== Clean up Stage ===============================
 void NoiseWorld::exitPhysics()

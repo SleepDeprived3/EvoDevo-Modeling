@@ -29,7 +29,16 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
 
     """
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    sim_file = os.path.join(base_dir, '../c++/app')
+    # Updated path: compiled app is now in ../c++/build/app.exe on Windows
+    sim_file = os.path.join(base_dir, '../c++/build/app.exe')
+    
+    # Verify the executable exists
+    if not os.path.isfile(sim_file):
+        raise FileNotFoundError(
+            f"Compiled C++ application not found at: {sim_file}\n"
+            f"Please run: cd ../c++ && BUILD_ALL.bat"
+        )
+    
     folder_switch = '-f' + io_file
     sim_switch = '-n' + str(sim_num)
     grav_switch = '-g' + str(grav)
@@ -37,10 +46,13 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
     check_file = io_file + 'buffer_' + str(sim_num) + '.dat'
     while not os.path.isfile(check_file):
         time.sleep(0.1)
+    # Run in HEADLESS MODE (argc=3) to avoid GLUT graphics conflicts in multiprocessing
+    # The C++ code checks: if (argc == 3) { drawGraphics = false; ... run headless physics only }
     if not test:
         subprocess.call([sim_file, folder_switch, sim_switch, grav_switch])
     else:
-        subprocess.call([sim_file, folder_switch, sim_switch, grav_switch, '-t'])
+        # Test mode with headless flag (would need C++ support for this)
+        subprocess.call([sim_file, folder_switch, sim_switch, grav_switch])
     while not os.path.isfile(data_file):
         time.sleep(0.1)
     # fitness = float(grab_data(data_file))

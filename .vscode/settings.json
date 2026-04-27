@@ -1,0 +1,8 @@
+{
+    "python.defaultInterpreterPath": "C:\\Users\\khatch\\.local\\bin\\python3.14.exe",
+    "python.linting.enabled": false,
+    "python.formatting.provider": "none",
+    "[python]": {
+        "editor.defaultFormatter": null
+    }
+}
