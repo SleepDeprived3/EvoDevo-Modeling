@@ -439,8 +439,11 @@ void NoiseWorld::ParseCmdLine(char* swtxt)
       {
 	sscanf(swtxt, "-g%f", &gravity_value);
       }
-      glFlush();
-      glutSwapBuffers();
+      if (drawGraphics)
+      {
+        glFlush();
+        glutSwapBuffers();
+      }
     }
 }
 

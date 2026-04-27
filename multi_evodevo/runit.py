@@ -103,7 +103,7 @@ def make_sql_db(population, reproduction_cond,
                                                      mod_build_cond,
                                                      grav)
     if not os.path.isdir(the_file[:8]):
-        os.path.makedirs(the_file[:8])
+        os.makedirs(the_file[:8])
     while (os.path.isfile(the_file)):
         # print the_file
         index = the_file.find('.db')
@@ -428,7 +428,10 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                                  int(reproduction_error_rate *
                                                      10000),
                                                  int(build_error_rate * 10000))
-    pickle_file = ''.join(('../data/prng_states/', cond_str))
+    pickle_dir = '../data/prng_states/'
+    if not os.path.isdir(pickle_dir):
+        os.makedirs(pickle_dir)
+    pickle_file = ''.join((pickle_dir, cond_str))
     with open(pickle_file, 'wb+') as pfw:
         pickle.dump(main_prng, pfw)
 

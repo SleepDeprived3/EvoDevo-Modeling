@@ -23,6 +23,10 @@ g++ -O0 -fno-inline -g -std=gnu++11 -I/home/josh/bullet-2.82-r2704/Demos/OpenGL/
 int main(int argc, char *argv[])
 
 {
+  // Initialize GLUT framework first (required for graphics initialization)
+  // Safe even in headless mode as glutSwapBuffers is guarded by drawGraphics flag
+  glutInit(&argc, argv);
+  
   NoiseWorld simulation;
   /*
   if (argc == 1)
