@@ -9,6 +9,7 @@ import multiprocessing as mp
 from functools import partial
 import sqlite3
 import pickle
+import csv
 from operator import itemgetter
 from numpy.random import RandomState
 import cProfile
@@ -49,7 +50,7 @@ def make_io_file(pop, repro_cond, build_cond, grav, io_dir='../io/'):
 
 
 # Making a set of populations, and a function to grab them
-def make_population_db(db='../data/population_genes.db', num=10):
+def make_population_db(db='../data/population_genes.db', num=151):
     if not os.path.isdir(db[:8]):
         os.makedirs(db[:8])
     conn = sqlite3.connect(db)
@@ -76,7 +77,7 @@ def fill_population_table(table, db='../data/population_genes.db'):
     conn.close()
 
 
-def make_filled_db(db='../data/population_genes.db', num=10):
+def make_filled_db(db='../data/population_genes.db', num=151):
     make_population_db(db, num)
     for i in range(num):
         fill_population_table(i, db)
@@ -98,10 +99,10 @@ def make_sql_db(population, reproduction_cond,
                 building_cond, generations, grav):
     mod_repro_cond = int(reproduction_cond * 10000)
     mod_build_cond = int(building_cond * 10000)
-    the_file = '../data/pop{}r{:04}b{:04}.db'.format(population,
-                                                     mod_repro_cond,
-                                                     mod_build_cond,
-                                                     grav)
+    the_file = '../data/pop{}r{:04}b{:04}g{}.db'.format(population,
+                                                        mod_repro_cond,
+                                                        mod_build_cond,
+                                                        grav)
     if not os.path.isdir(the_file[:8]):
         os.makedirs(the_file[:8])
     while (os.path.isfile(the_file)):
@@ -434,15 +435,72 @@ def run_generations(reproduction_error_rate, build_error_rate,
     pickle_file = ''.join((pickle_dir, cond_str))
     with open(pickle_file, 'wb+') as pfw:
         pickle.dump(main_prng, pfw)
+    return db_name
+
+
+def export_db_to_csv(db_file):
+    """Export all tables from SQLite database to CSV files."""
+    con = sqlite3.connect(db_file)
+    con.row_factory = sqlite3.Row
+    cursor = con.cursor()
+    
+    # Get all table names
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    
+    if not tables:
+        print(f"No tables found in {db_file}")
+        con.close()
+        return
+    
+    db_dir = os.path.dirname(db_file)
+    db_name = os.path.basename(db_file).replace('.db', '')
+    
+    for table in tables:
+        table_name = table[0]
+        csv_file = os.path.join(db_dir, f"{db_name}_{table_name}.csv")
+        
+        # Get all data from table
+        cursor.execute(f"SELECT * FROM {table_name}")
+        rows = cursor.fetchall()
+        
+        if rows:
+            # Get column names
+            col_names = [description[0] for description in cursor.description]
+            
+            # Write to CSV
+            with open(csv_file, 'w', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=col_names)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow(dict(row))
+            print(f"  ✓ Exported {table_name} -> {csv_file}")
+        else:
+            print(f"  ⚠ {table_name} is empty, skipping CSV export")
+    
+    con.close()
 
 
 @do_cprofile
 def main():
+    # Ensure required directories exist
+    data_dir = '../data/'
+    io_dir = '../io/'
+    if not os.path.isdir(data_dir):
+        os.makedirs(data_dir)
+        print(f"✓ Created directory: {data_dir}")
+    if not os.path.isdir(io_dir):
+        os.makedirs(io_dir)
+        print(f"✓ Created directory: {io_dir}")
+    
     if not os.path.isfile('../data/population_genes.db'):
         make_filled_db()
     pop_num = int(input("What population should be run? "))
     gen_num = int(input("How many generations should be run? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate")).lower()
+    #num_trials = int(input("How many independent trials (reps) per condition? "))
+    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n")).lower()
+    databases_to_export = []  # Track databases for CSV export
+    
     if thing_to_test == "1":
         rep_er = float(input(
             "What reproduction error condition? "))
@@ -452,7 +510,19 @@ def main():
         gravity_values = [-4, -7, -10, -13, -16]
         for grav_val in gravity_values:
             print("Gravity: ", grav_val)
-            run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
+            db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
+            databases_to_export.append(db_file)
+        
+        # Export all databases to CSV files
+        print("\n" + "="*70)
+        print("EXPORTING DATABASES TO CSV FILES")
+        print("="*70)
+        for db_file in databases_to_export:
+            print(f"\nExporting {os.path.basename(db_file)}...")
+            export_db_to_csv(db_file)
+        print("\n" + "="*70)
+        print("CSV EXPORT COMPLETE")
+        print("="*70)
         return 0
         
         
@@ -470,7 +540,19 @@ def main():
             for build_er_cond in range(build_cond_start, build_cond_end+1, 5):
                 build_er = build_er_cond / 10000.
                 print("Start condition ", [rep_er, build_er])
-                run_generations(rep_er, build_er, pop_num, generations=gen_num)
+                db_file = run_generations(rep_er, build_er, pop_num, generations=gen_num)
+                databases_to_export.append(db_file)
+        
+        # Export all databases to CSV files
+        print("\n" + "="*70)
+        print("EXPORTING DATABASES TO CSV FILES")
+        print("="*70)
+        for db_file in databases_to_export:
+            print(f"\nExporting {os.path.basename(db_file)}...")
+            export_db_to_csv(db_file)
+        print("\n" + "="*70)
+        print("CSV EXPORT COMPLETE")
+        print("="*70)
         return 0
     else:
         return "Error. Stopping experiment"

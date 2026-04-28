@@ -18,3 +18,8 @@ test/__pycache__/
 # Package stuff
 setup.py
 multi_evodevo/__init__*
+
+# Ignore all database files
+*.db
+# Ignore the entire data directory if you don't want any of it on GitHub
+data/
