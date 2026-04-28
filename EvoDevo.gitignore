@@ -1,0 +1,25 @@
+# Data Files
+data/*
+io/*
+figs/*
+multi_evodevo/figures*
+
+# Temp files
+*~
+*#
+
+# Python stuff
+# Byte-compiled / optimized / DLL files
+.egg*
+test/__pycache__/
+*.pyc
+
+
+# Package stuff
+setup.py
+multi_evodevo/__init__*
+
+# Ignore all database files
+*.db
+# Ignore the entire data directory if you don't want any of it on GitHub
+data/

@@ -1,0 +1,54 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.exe
+*.dll
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# IDE
+.vscode/
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Backup files
+*.bak
+*.backup
+*~
+*.~
+
+# Build outputs (but keep build/ directory for scripts)
+build/app.exe
+build/bullet-build-windows/
+build/freeglut-local/
+build/scripts/*.txt
+
+# Object files
+*.o
+*.obj
+*.gch
+
+# Libraries (exclude .a/.lib from repo, they're built)
+*.a
+*.lib
