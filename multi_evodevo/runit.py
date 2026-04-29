@@ -36,13 +36,14 @@ def do_cprofile(func):
     return profiled_func
 
 
-def make_io_file(pop, repro_cond, build_cond, grav, io_dir='../io/'):
+def make_io_file(pop, repro_cond, build_cond, grav, io_dir='../io/', trial_seed=42):
     mod_repro_cond = int(repro_cond * 10000)
     mod_build_cond = int(build_cond * 10000)
-    cond_str = 'pop{}r{:04}b{:04}pop{}'.format(pop,
-                                          mod_repro_cond,
-                                          mod_build_cond,
-                                          grav)
+    cond_str = 'pop{}r{:04}b{:04}g{}seed{}'.format(pop,
+                                                    mod_repro_cond,
+                                                    mod_build_cond,
+                                                    grav,
+                                                    trial_seed)
     io_file = ''.join((io_dir, cond_str))
     if not os.path.isdir(io_file):
         os.makedirs(io_file)
@@ -96,17 +97,17 @@ def grab_pop_genome(table, agent, db='../data/population_genes.db'):
 
 # Create and manage simulation data
 def make_sql_db(population, reproduction_cond,
-                building_cond, generations, grav):
+                building_cond, generations, grav, trial_seed=42):
     mod_repro_cond = int(reproduction_cond * 10000)
     mod_build_cond = int(building_cond * 10000)
-    the_file = '../data/pop{}r{:04}b{:04}g{}.db'.format(population,
-                                                        mod_repro_cond,
-                                                        mod_build_cond,
-                                                        grav)
+    the_file = '../data/pop{}r{:04}b{:04}g{}seed{}.db'.format(population,
+                                                               mod_repro_cond,
+                                                               mod_build_cond,
+                                                               grav,
+                                                               trial_seed)
     if not os.path.isdir(the_file[:8]):
         os.makedirs(the_file[:8])
     while (os.path.isfile(the_file)):
-        # print the_file
         index = the_file.find('.db')
         if the_file[index-1] == ')':
             if the_file[index-3:index-1] == '10':
@@ -116,7 +117,6 @@ def make_sql_db(population, reproduction_cond,
             the_file = ''.join((the_file[:index-4], insert, '.db'))
         else:
             the_file = ''.join((the_file[:index], ' (1).db'))
-    # print the_file
     conn = sqlite3.connect(the_file)
     c = conn.cursor()
     for i in range(generations):
@@ -131,12 +131,24 @@ def make_sql_db(population, reproduction_cond,
 
 
 def write_to_sql_table(db, generation, data):
-    conn = sqlite3.connect(db)
-    c = conn.cursor()
-    s = '''INSERT INTO gen{} VALUES (?, ?, ?, ?, ?, ?, ?)'''.format(generation)
-    c.execute(s, data)
-    conn.commit()
-    conn.close()
+    import time
+    max_retries = 10
+    for attempt in range(max_retries):
+        try:
+            conn = sqlite3.connect(db, timeout=30)
+            c = conn.cursor()
+            s = '''INSERT INTO gen{} VALUES (?, ?, ?, ?, ?, ?, ?)'''.format(generation)
+            c.execute(s, data)
+            conn.commit()
+            conn.close()
+            return
+        except sqlite3.OperationalError:
+            try:
+                conn.close()
+            except Exception:
+                pass
+            time.sleep(0.5 * (attempt + 1))
+    raise RuntimeError(f"Failed to write sim_num={data[0]} gen={generation} after {max_retries} retries")
 
 
 def grab_sim_selection_data(db, gen):
@@ -144,11 +156,15 @@ def grab_sim_selection_data(db, gen):
     c = conn.cursor()
     s = 'SELECT sim_num, fitness, germline_genes FROM gen{}'.format(gen)
     c.execute(s)
-    data = sorted(c.fetchall(),
-                  key=itemgetter(1, 0))
+    raw = c.fetchall()
     conn.close()
+    assert len(raw) == 60, f"Expected 60 rows in gen{gen}, got {len(raw)}"
+    cleaned = [(sim_num, fitness if fitness is not None else 0.0, genome)
+            for sim_num, fitness, genome in raw]
+    data = sorted(cleaned, key=lambda x: (x[1], x[0]))
     fitness = [data[i][1] for i in range(len(data))]
     genomes = [(data[i][0], data[i][2]) for i in range(len(data))]
+    conn.close()
     while fitness[-1] == '-nan':
         print(fitness)
         fitness.pop()
@@ -337,9 +353,12 @@ def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, g
                                              frame_selection,
                                              ann_selection)
     export.export_all(blueprints[0], blueprints[1], blueprints[2],
-                      blueprints[3], blueprints[4], blueprints[5],
-                      blueprints[6], sim_num, io_file)
-    fitness = simulate.run_simulation(io_file, sim_num, grav=grav)
+                  blueprints[3], blueprints[4], blueprints[5],
+                  blueprints[6], sim_num, io_file)
+    try:
+        fitness = simulate.run_simulation(io_file, sim_num, grav=grav)
+    except Exception:
+        return write_to_sql_table(db, gen, abort_data)
     data = (sim_num,
             parent,
             fitness,
@@ -351,19 +370,12 @@ def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, g
 
 
 def run_generations(reproduction_error_rate, build_error_rate,
-                    pop_num, grav=-9.81, generations=100, agents=60):
-    main_prng = RandomState(42)
-
-    db_name = make_sql_db(pop_num,
-                          reproduction_error_rate,
-                          build_error_rate,
-                          generations, 
-                          grav)
-    io_file = ''.join((make_io_file(pop_num,
-                                    reproduction_error_rate,
-                                    build_error_rate,
-                                    grav),
-                       '/'))
+                    pop_num, grav=-9.81, generations=100, agents=60, trial_seed=42):
+    main_prng = RandomState(trial_seed)
+    db_name = make_sql_db(pop_num, reproduction_error_rate, build_error_rate,
+                          generations, grav, trial_seed=trial_seed)
+    io_file = ''.join((make_io_file(pop_num, reproduction_error_rate, build_error_rate,
+                                    grav, trial_seed=trial_seed), '/'))
     initial_genomes = list()
     for i in range(agents):
         initial_genomes.append((i,
@@ -425,10 +437,10 @@ def run_generations(reproduction_error_rate, build_error_rate,
         del(selection_genomes)
         del(fit_data)
         # print "Done with generation", generation
-    cond_str = 'prng_pop{}r{:04}b{:04}.p'.format(pop_num,
-                                                 int(reproduction_error_rate *
-                                                     10000),
-                                                 int(build_error_rate * 10000))
+    cond_str = 'prng_pop{}r{:04}b{:04}seed{}.p'.format(pop_num,
+                                                        int(reproduction_error_rate * 10000),
+                                                        int(build_error_rate * 10000),
+                                                        trial_seed)
     pickle_dir = '../data/prng_states/'
     if not os.path.isdir(pickle_dir):
         os.makedirs(pickle_dir)
@@ -495,23 +507,25 @@ def main():
     
     if not os.path.isfile('../data/population_genes.db'):
         make_filled_db()
-    pop_num = int(input("What population should be run? "))
-    gen_num = int(input("How many generations should be run? "))
+    pop_num = 60 #int(input("What population should be run? "))
+    gen_num = 100 #int(input("How many generations should be run? "))
     #num_trials = int(input("How many independent trials (reps) per condition? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n")).lower()
+    thing_to_test = "1" #str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n")).lower()
     databases_to_export = []  # Track databases for CSV export
     
     if thing_to_test == "1":
-        rep_er = float(input(
-            "What reproduction error condition? "))
-        build_er = float(input(
-            "What build error condition? "))
+        rep_er = 0.005 #float(input("What reproduction error condition? "))
+        build_er = 0.005 #float(input("What build error condition? "))
         # Run 5 generations with incrementally increasing gravity
         gravity_values = [-4, -7, -10, -13, -16]
-        for grav_val in gravity_values:
-            print("Gravity: ", grav_val)
-            db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
-            databases_to_export.append(db_file)
+        trial_seeds = list(range(10))
+        for trial_seed in trial_seeds:
+            for grav_val in gravity_values:
+                print(f"Trial seed: {trial_seed}  Gravity: {grav_val}")
+                db_file = run_generations(rep_er, build_er, pop_num,
+                                          grav=grav_val, generations=gen_num,
+                                          trial_seed=trial_seed)
+                databases_to_export.append(db_file)
         
         # Export all databases to CSV files
         print("\n" + "="*70)
@@ -535,13 +549,17 @@ def main():
             "End with which reproduction error condition? "))
         build_cond_end = int(input(
             "End with which build error condition? "))
-        for rep_er_cond in range(rep_cond_start, rep_cond_end+1, 5):
-            rep_er = rep_er_cond / 10000.
-            for build_er_cond in range(build_cond_start, build_cond_end+1, 5):
-                build_er = build_er_cond / 10000.
-                print("Start condition ", [rep_er, build_er])
-                db_file = run_generations(rep_er, build_er, pop_num, generations=gen_num)
-                databases_to_export.append(db_file)
+        trial_seeds = list(range(10))
+        for trial_seed in trial_seeds:
+            for rep_er_cond in range(rep_cond_start, rep_cond_end+1, 5):
+                rep_er = rep_er_cond / 10000.
+                for build_er_cond in range(build_cond_start, build_cond_end+1, 5):
+                    build_er = build_er_cond / 10000.
+                    print(f"Trial seed: {trial_seed}  Condition: [{rep_er}, {build_er}]")
+                    db_file = run_generations(rep_er, build_er, pop_num,
+                                            generations=gen_num,
+                                            trial_seed=trial_seed)
+                    databases_to_export.append(db_file)
         
         # Export all databases to CSV files
         print("\n" + "="*70)
