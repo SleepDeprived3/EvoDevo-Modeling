@@ -23,3 +23,8 @@ multi_evodevo/__init__*
 *.db
 # Ignore the entire data directory if you don't want any of it on GitHub
 data/
+
+.vscode/
+__pycache__/
+*.pyc
+.DS_Store
