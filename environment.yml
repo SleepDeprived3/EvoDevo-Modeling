@@ -1,0 +1,29 @@
+# A config file for Conda that describes the environment needed for the ECE model
+
+name: ECE_model_2.0
+
+channels:                  
+  - conda-forge                # primary: scientific/robotics packages
+  - defaults                   # fallback
+
+dependencies:
+  - python=3.11                
+  - numpy                
+  - scipy                      
+  - pybullet                  
+  - cmake
+  - gcc  
+  - make
+  - os
+  - random
+  - itertools
+  - math
+  - time
+  - multiprocessing
+  - functools
+  - sqlite3
+  - pickle
+  - csv
+  - operator
+  - cProfile
+  - subprocess
