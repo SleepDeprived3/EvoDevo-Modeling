@@ -44,9 +44,17 @@ def make_io_file(pop, repro_cond, build_cond, grav, io_dir='../io/'):
                                           mod_build_cond,
                                           grav)
     io_file = ''.join((io_dir, cond_str))
+
+    # ensures io is a folder
+    if not io_file.endswith('/'):
+        io_file += '/'
+
+    # creates the folder if it doesn't exist
     if not os.path.isdir(io_file):
         os.makedirs(io_file)
-    return io_file
+
+    # returnst the absolute path
+    return os.path.abspath(io_file) + '/'
 
 
 # Making a set of populations, and a function to grab them
@@ -392,7 +400,7 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                io_file=io_file,
                                grav=grav)
         sim_pool = mp.Pool(mp.cpu_count())
-        sim_pool.map(wrap_run_one, range(agents))
+        sim_pool.map(wrap_run_one, range(agents)) 
         sim_pool.close()
         sim_pool.join()
         fit_data, selection_genomes = grab_sim_selection_data(db_name,
@@ -498,7 +506,7 @@ def main():
     pop_num = int(input("What population should be run? "))
     gen_num = int(input("How many generations should be run? "))
     #num_trials = int(input("How many independent trials (reps) per condition? "))
-    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n")).lower()
+    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n3. Test Simulation (with graphics)\n")).lower()
     databases_to_export = []  # Track databases for CSV export
     
     if thing_to_test == "1":
@@ -512,7 +520,6 @@ def main():
             print("Gravity: ", grav_val)
             db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
             databases_to_export.append(db_file)
-        
         # Export all databases to CSV files
         print("\n" + "="*70)
         print("EXPORTING DATABASES TO CSV FILES")
@@ -542,7 +549,6 @@ def main():
                 print("Start condition ", [rep_er, build_er])
                 db_file = run_generations(rep_er, build_er, pop_num, generations=gen_num)
                 databases_to_export.append(db_file)
-        
         # Export all databases to CSV files
         print("\n" + "="*70)
         print("EXPORTING DATABASES TO CSV FILES")
@@ -554,9 +560,19 @@ def main():
         print("CSV EXPORT COMPLETE")
         print("="*70)
         return 0
+    
+
+    elif thing_to_test == "3":
+        grav_val = int(input(
+            "What gravity condition? (note: this should be a negative integer) "))
+        somaline_genes = str(input(
+            "Input the somaline gene code of the trial. "))
+        db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
+        return 0
+
+
     else:
         return "Error. Stopping experiment"
-    
 
 
 # Script to run 1 population through all conditions, serially

@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 
-def run_simulation(io_file, sim_number, gravity, headless=True, steps=500):
+def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=500):
     """
     Run the PyBullet physics simulation.
     
@@ -25,18 +25,20 @@ def run_simulation(io_file, sim_number, gravity, headless=True, steps=500):
         int: Exit code from the simulation
     """
     script_dir = Path(__file__).parent
-    main_script = script_dir / "main_pybullet.py"
+    main_script = script_dir / "main.py"
     
     if not main_script.exists():
         print(f"ERROR: {main_script} not found!")
         return 1
     
+    '''
     print("=" * 70)
     print("EvoDevo PyBullet Physics Simulation")
     print("=" * 70)
     print(f"Script: {main_script}")
     print("=" * 70)
     print()
+    '''
     
     # Build command
     cmd = [sys.executable, str(main_script)]
@@ -58,7 +60,7 @@ def run_simulation(io_file, sim_number, gravity, headless=True, steps=500):
     except Exception as e:
         print(f"ERROR: Failed to run simulation: {e}")
         return 1
-
+    
 
 
 
@@ -103,7 +105,7 @@ def main():
     
     args = parser.parse_args()
     
-    return run_simulation(
+    return run_simulation_entry(
         io_file=args.file,
         sim_number=args.number,
         gravity=args.gravity,

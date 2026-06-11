@@ -9,21 +9,41 @@ implementation of the physics simulation used in the previous ECE mode.
 Author: James Hatch
 """
 
+from pathlib import Path
+
 import pybullet as p
 import pybullet_data
 import numpy as np
 import math
 
-# Constants from C++ implementation
+# ---- All identified part constants ----
 UNITS_TO_RADS = math.pi
 SENSOR_RADIUS = 0.1
-DENSITY = 1.9098593171   # Q for JHM: why did we choose these values?
+DENSITY = 1.9098593171   
 FRICTION = 0.8
 ROLLING_FRICTION = 0.5
 MOTOR_MAX_IMPULSE = 0.4
 DT = 1.0 / 60.0
 
-class BodyPart:
+
+# Still trying to figure out
+# 1. what about matrix blueprints? (see UseMatrixBlueprints() in NoiseWorld.h)
+# 2. why choose 1.9098593171 for density? (see NoiseWorld.cpp line 28)
+# 3. should the ground plane be at y=-2 like it was in the C++ simulation? I have set it to 0 for now... is this problematic?
+# 4. do i need to add in delete functions if turning off the simulation effectively ends/deletes everything
+# 5. is add_sensor() necessary
+# 6. Is the hinge used in the C++ code a fixed joint with constraints, but there is no good pybullet equivalent? While I can replicate a similar joint without angle limits, angle limits seem hard to incorporate without writing a custom constraint, which is a bit beyond my current pybullet knowledge 
+
+# 6. CURRENT ISSUE: blueprints are not being read. I think /io and /data need to exist within the 
+# project directory, and the blueprint files need to be in there with the correct naming convention (e.g. b_bf_0.dat for body blueprints for sim 0). I have added some print statements to main.py to check if the blueprints are being read correctly, and they are not showing up. I will need to investigate this further and make sure the file paths are correct and the files are being read properly.
+
+
+# ---- Imports for all part types (all found in legacy code) ----
+# Current implementations include BodyPart, JointPart, and SensorPart
+# originally from - NoiseWorld.h
+# Note: C++ version had methods for each part called readBlueprint() and printSelf()
+#       these have been replaced with the new load_blueprints_from_file() method in main.py.
+class BodyPart: ###
     """
     Represents a rigid body (sphere) in the simulation
     Properties include the sphere's ID, position (x,y,z), and size (radius)
@@ -34,11 +54,8 @@ class BodyPart:
         self.y = y
         self.z = z
         self.size = size
-    # what about readBlueprint and printSelf()?
 
-
-
-class JointPart:
+class JointPart: ###
     """
     Represents a hinge constraint between two bodies
     Properties include the joint's ID, connecting bodies, 
@@ -58,10 +75,8 @@ class JointPart:
         self.lower_limit = lower_limit
         self.upper_limit = upper_limit
         self.motor = motor
-    # what about readBlueprint and printSelf()?
 
-
-class SensorPart:
+class SensorPart: ###
     """
     Represents a touch sensor attached to a body
     Properties include the sensor's ID, associated body, and relative position (x,y,z)
@@ -72,10 +87,11 @@ class SensorPart:
         self.x = x
         self.y = y
         self.z = z
-    # what about readBlueprint and printSelf()?
 
 
 
+# ---- A class that defines part contact ----
+# originally from - NoiseWorld.cpp
 class ContactCallback:
     """Manages collision detection and touch tracking"""
     def __init__(self):
@@ -84,7 +100,7 @@ class ContactCallback:
 
     def check_collisions(self, physics_client):
         """Check all collisions and update body_touches"""
-        num_contacts = p.getNumContacts(physicsClientId=physics_client)
+        num_contacts = len(p.getContactPoints(physicsClientId = physics_client))
         
         # Reset all touches
         for body_id in self.body_touches:
@@ -93,8 +109,7 @@ class ContactCallback:
         
         # Process all contacts
         for i in range(num_contacts):
-            contact = p.getContactPoints(contactFilterA=-1, contactFilterB=-1, 
-                                        physicsClientId=physics_client)[i]
+            contact = p.getContactPoints(physicsClientId=physics_client)[i]
             body_id_a = contact[1]
             body_id_b = contact[2]
             contact_point_a = np.array(contact[5])  # positionOnA
@@ -162,13 +177,14 @@ class PyBulletWorld:
         self.output_n2j = []
         
         # creating a ground plane (defined in the following function)
-        self._create_ground()
+        self.create_ground()
     
 
 
-    def _create_ground(self):
+    # ---- Creating world objects ----
+    def create_ground(self): ###
         """
-        Create static ground plane at y = -1 
+        Create static ground plane at y = 0
         """
         # sets up the plane shape
         ground_shape = p.createCollisionShape(p.GEOM_PLANE, physicsClientId=self.client)
@@ -177,7 +193,7 @@ class PyBulletWorld:
         ground_body = p.createMultiBody(
             baseMass = 0,
             baseCollisionShapeIndex = ground_shape,
-            basePosition = [0, -1, 0],
+            basePosition = [0, 0, 0], 
             physicsClientId = self.client
         )
 
@@ -187,8 +203,7 @@ class PyBulletWorld:
         self.contact_callback.touches_point[ground_body] = np.array([0.0, 0.0, 0.0])
     
 
-
-    def create_body(self, body_part):
+    def create_body(self, body_part): ###
         """
         Create a rigid body sphere in the simulation
         """
@@ -217,19 +232,17 @@ class PyBulletWorld:
         # set physics properties (fricion, damping)
         p.changeDynamics(
             body_id,
-            -1,  # Q: what does link index of -1 mean? (base link?)
-            friction=FRICTION,
+            -1,  # referring to the original body itself (not a link)
+            lateralFriction=FRICTION,
             rollingFriction=ROLLING_FRICTION,
             linearDamping=0.0,
             angularDamping=0.0,
             physicsClientId=self.client
         )
         
-        #------ ???
-        # keeping the component activeand trackable for collisions
+        # keeping the component active and trackable for collisions
         p.setCollisionFilterGroupMask(body_id, -1, 1, 1, physicsClientId=self.client)
         p.changeDynamics(body_id, -1, 
-                        activationState=p.ACTIVATION_STATE_DISABLE_DEACTIVATION, 
                         physicsClientId=self.client)
         
         # Store mapping
@@ -244,7 +257,7 @@ class PyBulletWorld:
         return body_id
     
 
-    def PointWorldToLocal(self, bodyIndex, point):
+    def PointWorldToLocal(self, bodyIndex, point): ###
         """
         Convert a point from world coordinates to local coordinates for a given body
         """
@@ -263,7 +276,7 @@ class PyBulletWorld:
         return point_local
     
 
-    def AxisWorldToLocal(self, bodyIndex, axis):
+    def AxisWorldToLocal(self, bodyIndex, axis): ###
         """
         Convert an axis from world coordinates to local coordinates for a given body
         """
@@ -273,7 +286,7 @@ class PyBulletWorld:
             physicsClientId=self.client
         )
         
-        # invert the quaternion to get the inverse rotation
+        # invert the vector to get the inverse rotation
         inv_orientation = p.invertTransform([0, 0, 0], orientation)[1]
         
         # apply inverse rotation to convert from world to local coordinates
@@ -281,8 +294,20 @@ class PyBulletWorld:
         
         return axis_local
 
-	
-	
+
+    def _debug_constraint(self, body_a_id, body_b_id):
+        num_bodies = p.getNumBodies(physicsClientId=self.client)
+        valid_ids = [p.getBodyUniqueId(i, physicsClientId=self.client) 
+                    for i in range(num_bodies)]
+        
+        print(f"Valid body IDs in world: {valid_ids}")
+        print(f"body_a_id={body_a_id} valid={body_a_id in valid_ids}")
+        print(f"body_b_id={body_b_id} valid={body_b_id in valid_ids}")
+        print(f"Same body? {body_a_id == body_b_id}")
+        
+        for bid in [body_a_id, body_b_id]:
+            num_links = p.getNumJoints(bid, physicsClientId=self.client)
+            print(f"  Body {bid} has {num_links} joints/links")
     
     def create_joint(self, joint_part):
         """
@@ -294,34 +319,30 @@ class PyBulletWorld:
         
         # World coordinates from joint blueprint
         position = np.array([joint_part.px, joint_part.py, joint_part.pz])
-        axis = np.array([joint_part.ax, joint_part.ay, joint_part.az])
         
         # Convert to local coordinates for each body (matching C++ CreateHinge)
         loc_point_1 = self.PointWorldToLocal(joint_part.base_body, position)
-        loc_axis_1 = self.AxisWorldToLocal(joint_part.base_body, axis)
         loc_point_2 = self.PointWorldToLocal(joint_part.other_body, position)
-        loc_axis_2 = self.AxisWorldToLocal(joint_part.other_body, axis)
-        
+        #loc_axis_2 = self.AxisWorldToLocal(joint_part.other_body, axis)
+
         # Create hinge constraint with local coordinates
         constraint_id = p.createConstraint(
             body_a_id,
             -1,  # base link
             body_b_id,
             -1,  # base link
-            p.JOINT_HINGE,
-            jointAxis=loc_axis_1,
-            parentFramePosition=loc_point_1,
-            childFramePosition=loc_point_2,
-            physicsClientId=self.client
+            p.JOINT_POINT2POINT, # <------------------------------------------------------
+            jointAxis = [0, 0, 0],
+            parentFramePosition = loc_point_1.tolist(),
+            childFramePosition = loc_point_2.tolist(),
+            physicsClientId = self.client
         )
-        
+
         # Set joint limits (lower and upper)
         p.changeConstraint(
             constraint_id,
-            jointLowerLimit=joint_part.lower_limit,
-            jointUpperLimit=joint_part.upper_limit,
-            maxForce=MOTOR_MAX_IMPULSE if joint_part.motor else 0,
-            physicsClientId=self.client
+            maxForce = MOTOR_MAX_IMPULSE if joint_part.motor else 0,
+            physicsClientId = self.client
         )
         
         # Store joint
@@ -329,13 +350,16 @@ class PyBulletWorld:
             'constraint_id': constraint_id,
             'body_a': body_a_id,
             'body_b': body_b_id,
-            'motor_enabled': joint_part.motor
+            'motor_enabled': joint_part.motor,
+            'lower': joint_part.lower_limit,
+            'upper': joint_part.upper_limit,
+            'axis': np.array([joint_part.ax, joint_part.ay, joint_part.az])
         }
         self.joint_parts.append(joint_part)
 
 
     
-    def add_sensor(self, sensor_part):
+    def add_sensor(self, sensor_part): #<----------------------------------------------------------DO I NEED
         """
         Add a touch sensor to a body
         """
@@ -343,23 +367,23 @@ class PyBulletWorld:
 
 
     
-    def actuate_joint(self, joint_id, desired_angle, dt):
+    def actuate_joint(self, joint_id, desired_angle, dt): ###
         """
-        Apply motor command to joint (matching C++ ActuateJoint signature)
+        Apply motor command to joint
         """
         if joint_id in self.joints and self.joints[joint_id]['motor_enabled']:
             constraint = self.joints[joint_id]['constraint_id']
-            # Set target angle for motor control with timestep (matching C++ behavior)
+            # Set target angle for motor control with timestep
             p.changeConstraint(
                 constraint,
-                targetPosition=desired_angle,
-                maxForce=MOTOR_MAX_IMPULSE,
-                physicsClientId=self.client
+                targetPosition = desired_angle,
+                maxForce = MOTOR_MAX_IMPULSE,
+                physicsClientId = self.client
             )
     
 
 
-    def calculate_layer(self, weights, data_in):
+    def calculate_layer(self, weights, data_in): ###
         """
         Neural network layer calculation 
         output[j] = sum_i(data_in[i] * weights[i][j])
@@ -368,7 +392,7 @@ class PyBulletWorld:
             return []
         
         output = []
-        num_outputs = len(weights[0]) if weights else 0
+        num_outputs = len(weights[0])
         num_inputs = len(data_in)
         
         for j in range(num_outputs):
@@ -382,9 +406,10 @@ class PyBulletWorld:
     
 
 
-    def sigmoid(self, x):
+    def tanh(self, x):
         """
-        Sigmoid activation: 2/(1+exp(-x)) - 1
+        Used in steps to adjust the neural network
+        Tanh activation: 2/(1+exp(-x)) - 1
         """
         try:
             return 2.0 / (1.0 + math.exp(-x)) - 1.0
@@ -435,6 +460,9 @@ class PyBulletWorld:
                          (contact_point[2] >= (sensor_z - SENSOR_RADIUS)))):
                         self.sensor_touches[sensor_idx] = 1
     
+
+
+
     def step(self):
         """Advance simulation by one timestep and process control"""
         # Check collisions
@@ -459,8 +487,8 @@ class PyBulletWorld:
                 # Combine outputs
                 motor_command = self.output_s2j[joint_idx] + self.output_n2j[joint_idx]
                 
-                # Apply sigmoid activation
-                motor_command = self.sigmoid(motor_command)
+                # Apply tanh activation
+                motor_command = self.tanh(motor_command)
                 
                 # Convert to radians
                 motor_command = motor_command * UNITS_TO_RADS
@@ -484,10 +512,10 @@ class PyBulletWorld:
     
 
 
-    def save_position(self, output_file, completed=True):
+    def save_position(self, output_file, completed): ###
         """
-        Save final position of first body (matching C++ Save_Position logic)
-        Only calculates distance if completed flag is True, matching C++ behavior
+        Save final position of first body 
+        Only calculates distance if completed flag is True
         """
         distance = 0.0
         if len(self.bodies) > 0 and completed:
@@ -498,15 +526,22 @@ class PyBulletWorld:
                 physicsClientId=self.client
             )
             
-            # Calculate distance from origin (matching C++ calculation)
+            # Calculate distance from origin (A^2 + B^2 = C^2)
             distance = math.sqrt(pos[0]**2 + pos[2]**2)
         
+        output_path = Path(output_file)
+
+        # create the file if it doesn't exist, otherwise overwrite
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
         # Write to file
-        with open(output_file, 'w') as f:
+        with open(output_path, 'w') as f:
             f.write(f"{distance}\n")
         
         return distance
     
+
+
 
     def disconnect(self):
         """

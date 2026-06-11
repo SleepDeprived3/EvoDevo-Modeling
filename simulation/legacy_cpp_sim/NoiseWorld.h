@@ -185,6 +185,11 @@ class NoiseWorld : public GlutDemoApplication
 	bool drawGraphics; 
 	unsigned long int timeStep;
 
+
+
+
+
+	
 	// Methods
 	btAlignedObjectArray<BodyPart> UseBodyBlueprints(string filename)
 	{

@@ -8,22 +8,10 @@ channels:
 
 dependencies:
   - python=3.11                
-  - numpy                
-  - scipy                      
-  - pybullet                  
+  - numpy
+  - scipy
+  - pybullet
   - cmake
-  - gcc  
+  - gcc
   - make
-  - os
-  - random
-  - itertools
-  - math
-  - time
-  - multiprocessing
-  - functools
-  - sqlite3
-  - pickle
-  - csv
-  - operator
-  - cProfile
-  - subprocess
+  - more-itertools
