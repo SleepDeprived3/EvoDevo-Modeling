@@ -43,19 +43,30 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
             print(f"ERROR: Timed out waiting for buffer file: {check_file}")
             return 0.0  
 
-    # run in headless mode to avoid GLUT graphics conflicts in multiprocessing (for now)
-    try:
-        subprocess.call([
-                sys.executable, runit_script,
-                '-f', os.path.abspath(io_file), # absolute path to try and get it pointing towards the /io folder
-                '-n', str(sim_num),
-                '-g', str(grav),
-                '--headless'
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60) # 60 sec simulation timeout safeguard
-    except subprocess.TimeoutExpired:
-        print(f"ERROR: Simulation {sim_num} hung and was forcefully terminated.")
-        return 0.0
+
+    # run in headless or headed mode
+    if not test:
+        try:
+            subprocess.call([
+                    sys.executable, runit_script,
+                    '-f', os.path.abspath(io_file),
+                    '-n', str(sim_num),
+                    '-g', str(grav),
+                    '--headless'
+                ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60) 
+        except subprocess.TimeoutExpired:
+            print(f"ERROR: Simulation {sim_num} hung and was forcefully terminated.")
+            return 0.0
+    else:
+        runit_script.run_simulation_entry(
+            os.path.abspath(io_file), 
+            str(sim_num), 
+            str(grav), 
+            headless=False, 
+            steps=500
+        )
         
+
     # safety timeout 2
     start_time = time.time()
     while not os.path.isfile(data_file):

@@ -1,3 +1,5 @@
 {
-    "cmake.sourceDirectory": "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/Demos/CollisionDemo"
+    "cmake.sourceDirectory": "/Users/jameshatch/Documents/GitHub/EvoDevo-Modeling/bullet-2.82-r2704/Demos/CollisionDemo",
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda"
 }

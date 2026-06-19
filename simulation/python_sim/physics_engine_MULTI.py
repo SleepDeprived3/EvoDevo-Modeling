@@ -33,6 +33,7 @@ DT = 1.0 / 60.0
 # 4. do i need to add in delete functions if turning off the simulation effectively ends/deletes everything
 # 5. is add_sensor() necessary
 # 6. Is the hinge used in the C++ code a fixed joint with constraints, but there is no good pybullet equivalent? While I can replicate a similar joint without angle limits, angle limits seem hard to incorporate without writing a custom constraint, which is a bit beyond my current pybullet knowledge 
+# 7. Is the Random(42) in run_generations() in runit.py consistent across each generation? Is that bad?
 
 # 6. CURRENT ISSUE: blueprints are not being read. I think /io and /data need to exist within the 
 # project directory, and the blueprint files need to be in there with the correct naming convention (e.g. b_bf_0.dat for body blueprints for sim 0). I have added some print statements to main.py to check if the blueprints are being read correctly, and they are not showing up. I will need to investigate this further and make sure the file paths are correct and the files are being read properly.

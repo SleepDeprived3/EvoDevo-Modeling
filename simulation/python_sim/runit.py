@@ -40,15 +40,16 @@ def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=500)
     print()
     '''
     
-    # Build command
-    cmd = [sys.executable, str(main_script)]
-    cmd.extend(["-f", str(io_file)])
-    cmd.extend(["-n", str(sim_number)])
-    cmd.extend(["-g", str(gravity)])
-    cmd.extend(["--steps", str(steps)])
-    
     if headless:
+        # Build command
+        cmd = [sys.executable, str(main_script)]
+        cmd.extend(["-f", str(io_file)])
+        cmd.extend(["-n", str(sim_number)])
+        cmd.extend(["-g", str(gravity)])
+        cmd.extend(["--steps", str(steps)])
         cmd.append("--headless")
+    else:
+        cmd.append()
     
     # Run the simulation
     try:

@@ -11,8 +11,10 @@ import sqlite3
 import pickle
 import csv
 from operator import itemgetter
+from turtle import pd
 from numpy.random import RandomState
 import cProfile
+from tqdm import tqdm
 
 import part
 import initiate
@@ -231,6 +233,63 @@ def compare_data(db1, db2, gen):
             print(data1[num][0], check, data1[num][1], data2[num][1])
 
 
+'''
+def consolidate_csvs(seeds, gravity, generations, pop_num, repro_cond, build_cond):
+    # This function would read all the CSV files generated from the databases,
+    # consolidate them into a single CSV file for easier analysis
+    
+    # configuring the output file and tracking missing files
+    output_path = "/content/drive/MyDrive/data_10_runs_evodevo/merged_master_data.csv"
+    missing_files = []
+    first_write = True
+
+    # total iterations: len(seeds) * len(gravity) * generations
+    total_expected = len(seeds) * len(gravity) * generations
+
+    # using a progress bar while merging files
+    with tqdm(total=total_expected, desc="Merging Files") as pbar:
+        for seed_cond in seeds:
+            for grav_cond in gravity:
+                for gen in range(generations):
+                    file_name = f"pop{pop_num}r{repro_cond:04}b{build_cond:04}g{grav_cond}seed{seed_cond}_gen{gen}.csv"
+                    file_path = f"/content/drive/MyDrive/data_10_runs_evodevo/{file_name}" # <-------------------------------------- needs to be adjusted and data/ and io/ need to be in repo
+
+                    if os.path.exists(file_path):
+                        try:
+                            # read the individual CSV
+                            new_table = pd.read_csv(file_path)
+
+                            #aAdd metadata columns
+                            new_table['gravity'] = grav_cond
+                            new_table['generation'] = gen
+                            new_table['seed'] = seed_cond
+
+                            # turn the table to a CSV
+                            # only write the header for the very first file
+                            new_table.to_csv(output_path,
+                                            mode='a',
+                                            index=False,
+                                            header=first_write)
+
+                            first_write = False
+                        except Exception as e:
+                            print(f"\nError reading {file_name}: {e}")
+                    else:
+                        missing_files.append(file_name)
+
+                    pbar.update(1)
+
+    # report missing files (if any)
+    if missing_files:
+        print(f"\nFinished! {len(missing_files)} files were missing.")
+        print("List of missing files:")
+        for m in missing_files:
+            print(f" - {m}")
+    else:
+        print("\nFinished! All files merged successfully.")
+
+        '''
+
 # Run and view one agent
 def test_one_agent(pop, gen, build_er, repro_er, version, agent):
     db = '../data/pop{}r{:04}b{:04}.db'.format(pop,
@@ -251,8 +310,8 @@ def test_one_agent(pop, gen, build_er, repro_er, version, agent):
     parts_developed = develop.update_cycles(proto_parts)
     frame_selection = develop.select_frame_parts(parts_developed)
     abort_data = (agent,
-                  0,  # PARENT_HOLDER
-                  0,  # fit = 0 when aborted
+                  0, 
+                  0, 
                   repro_er,
                   build_er,
                   genome,
@@ -269,7 +328,7 @@ def test_one_agent(pop, gen, build_er, repro_er, version, agent):
                       blueprints[6], agent, io_file)
     fitness = simulate.run_simulation(io_file, agent, True)
     data = (agent,
-            0,  # PARENT_HOLDER
+            0, 
             fitness,
             repro_er,
             build_er,
@@ -318,7 +377,11 @@ def check_data(og, cp):
 
 
 # Single simulation. Will be multiprocessed
-def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, grav):
+def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, grav, graphics=False):
+    if graphics:
+        fitness = simulate.run_simulation(io_file, sim_num, test=True, grav=grav)
+        return fitness
+    
     agent_prng = RandomState(seeds[sim_num])
     genome_info = all_genomes[sim_num]
     parent = genome_info[0]
@@ -388,7 +451,7 @@ def run_generations(reproduction_error_rate, build_error_rate,
         #     else:
         #         print len(i[1]),
         # print; print
-        agent_prng_seeds = main_prng.randint(0, 1000000, agents+1)
+        agent_prng_seeds = main_prng.randint(0, 1000000, agents+1) # TODO: is this still random for each gen?
         setup_data = [generation, reproduction_error_rate, build_error_rate, grav]
         wrap_run_one = partial(run_one,
                                seeds=agent_prng_seeds,
@@ -398,7 +461,8 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                repro_er=reproduction_error_rate,
                                db=db_name,
                                io_file=io_file,
-                               grav=grav)
+                               grav=grav,
+                               graphics=True)
         sim_pool = mp.Pool(mp.cpu_count())
         sim_pool.map(wrap_run_one, range(agents)) 
         sim_pool.close()
@@ -444,6 +508,33 @@ def run_generations(reproduction_error_rate, build_error_rate,
     with open(pickle_file, 'wb+') as pfw:
         pickle.dump(main_prng, pfw)
     return db_name
+
+
+def run_generation_graphic(grav, somaline, agent_id, total_agents, generation):
+    main_prng = RandomState(42)
+    agent_prng_seeds = (main_prng.randint(0, 1000000, total_agents+1))[agent_id]
+
+    run_one(
+        seeds=agent_prng_seeds,
+        all_genomes=somaline,
+        gen=0,
+        build_er=0,
+        repro_er=0,
+        db=db_name,
+        io_file=io_file,
+        grav=grav,
+        graphics=False
+    )
+    
+    sim_pool = mp.Pool(mp.cpu_count())
+    sim_pool.map(wrap_run_one, range(agents)) 
+    sim_pool.close()
+    sim_pool.join()
+    fit_data, selection_genomes = grab_sim_selection_data(db_name,
+                                                            generation)
+        
+        
+    
 
 
 def export_db_to_csv(db_file):
@@ -494,21 +585,26 @@ def main():
     # Ensure required directories exist
     data_dir = '../data/'
     io_dir = '../io/'
-    if not os.path.isdir(data_dir):
-        os.makedirs(data_dir)
-        print(f"✓ Created directory: {data_dir}")
-    if not os.path.isdir(io_dir):
-        os.makedirs(io_dir)
-        print(f"✓ Created directory: {io_dir}")
-    
-    if not os.path.isfile('../data/population_genes.db'):
-        make_filled_db()
-    pop_num = int(input("What population should be run? "))
-    gen_num = int(input("How many generations should be run? "))
-    #num_trials = int(input("How many independent trials (reps) per condition? "))
+
     thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n3. Test Simulation (with graphics)\n")).lower()
-    databases_to_export = []  # Track databases for CSV export
+
+
+    if thing_to_test == "1" or thing_to_test == "2":
+        if not os.path.isdir(data_dir):
+            os.makedirs(data_dir)
+            print(f"✓ Created directory: {data_dir}")
+        if not os.path.isdir(io_dir):
+            os.makedirs(io_dir)
+            print(f"✓ Created directory: {io_dir}")
+        if not os.path.isfile('../data/population_genes.db'):
+            make_filled_db()
+
+        pop_num = int(input("What population should be run? "))
+        gen_num = int(input("How many generations should be run? "))
+        #num_trials = int(input("How many independent trials (reps) per condition? "))
+        databases_to_export = []  # Track databases for CSV export
     
+
     if thing_to_test == "1":
         rep_er = float(input(
             "What reproduction error condition? "))
@@ -567,7 +663,12 @@ def main():
             "What gravity condition? (note: this should be a negative integer) "))
         somaline_genes = str(input(
             "Input the somaline gene code of the trial. "))
-        db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)
+        num = int(input(
+            "Input the agent ID (0 is the first agent). "))
+        total = int(input(
+            "Input the total number of agents during that trial. "))
+        fitness = run_generation_graphic(grav_val, somaline_genes, num, total)
+        print(f"Agent fitness = {fitness}")
         return 0
 
 
