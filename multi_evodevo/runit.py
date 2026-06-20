@@ -601,8 +601,8 @@ def main():
         if not os.path.isfile('../data/population_genes.db'):
             make_filled_db()
 
-        pop_num = 20#int(input("What population should be run? "))
-        gen_num = 100#int(input("How many generations should be run? "))
+        pop_num = 15#int(input("What population should be run? "))
+        gen_num = 60#int(input("How many generations should be run? "))
         #num_trials = int(input("How many independent trials (reps) per condition? "))
         databases_to_export = []  # Track databases for CSV export
     
@@ -666,11 +666,11 @@ def main():
         with open("../EVODEVO-MODELING/multi_evodevo/test.txt", "r") as file:
             somaline_genes = file.read().strip()
 
-        grav_val = -16#int(input(
+        grav_val = -7#int(input(
             #"What was the gravity condition? "))
-        num = 10#int(input(
+        num = 1#int(input(
             #"Input the agent index (ex: 0 is the first agent). "))
-        total = 20#int(input(
+        total = 59#int(input(
             #"Input the total number of agents during that trial. "))
         fitness = run_generation_graphic(grav_val, somaline_genes, num, total)
         print("")

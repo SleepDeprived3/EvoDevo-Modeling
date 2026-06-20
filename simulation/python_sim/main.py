@@ -118,7 +118,7 @@ def build_blueprint_filenames(io_file, sim_number):
 
 
 
-def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=500):
+def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000):
     """Run the PyBullet physics simulation"""
     
     '''
@@ -242,7 +242,7 @@ def main():
     parser.add_argument(
         "--steps",
         type=int,
-        default=500,
+        default=1000,
         help="Number of simulation steps"
     )
     

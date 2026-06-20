@@ -331,7 +331,18 @@ class PyBulletWorld:
         # Convert to local coordinates for each body (matching C++ CreateHinge)
         loc_point_1 = self.PointWorldToLocal(joint_part.base_body, position)
         loc_point_2 = self.PointWorldToLocal(joint_part.other_body, position)
-        #loc_axis_2 = self.AxisWorldToLocal(joint_part.other_body, axis)
+        
+        # adding in a little bit of extra wiggle room for joints to move
+        magnitude_1 = np.linalg.norm(loc_point_1)
+        magnitude_2 = np.linalg.norm(loc_point_2)
+        offset = 0.05
+        # add a clearance offset along that vector direction
+        if magnitude_1 > 0:
+            direction_1 = loc_point_1 / magnitude_1
+            loc_point_1 = loc_point_1 + (direction_1 * offset)
+        if magnitude_2 > 0:
+            direction_2 = loc_point_2 / magnitude_2
+            loc_point_2 = loc_point_2 + (direction_2 * offset)
 
         # Create hinge constraint with local coordinates
         constraint_id = p.createConstraint(
@@ -339,10 +350,20 @@ class PyBulletWorld:
             -1,  # base link
             body_b_id,
             -1,  # base link
-            p.JOINT_REVOLUTE,
+            p.JOINT_POINT2POINT,
             jointAxis = [joint_part.ax, joint_part.ay, joint_part.az],
             parentFramePosition = loc_point_1.tolist(),
             childFramePosition = loc_point_2.tolist(),
+            physicsClientId = self.client
+        )
+
+        # collision boundary since clipping keeps happening between bodies
+        p.setCollisionFilterPair(
+            bodyUniqueIdA = body_a_id,
+            bodyUniqueIdB = body_b_id,
+            linkIndexA = -1,
+            linkIndexB = -1,
+            enableCollision = 1, # 1 explicitly activates physical boundaries
             physicsClientId = self.client
         )
         
@@ -374,16 +395,18 @@ class PyBulletWorld:
             constraint_id = self.joints[joint_id]['constraint_id']
             axis = self.joints[joint_id]['axis']
             
-            # Convert target angle along the structural axis into a quaternion orientation
-            quat = p.getQuaternionFromAxisAngle(axis.tolist(), float(desired_angle))
-            
-            # Adjust constraint orientation dynamically
+            # calculate a quaternion (4-degree expression containing the magnitude, and 3 axis values)
+            half_angle = desired_angle / 2.0
+            s = np.sin(half_angle)
+            c = np.cos(half_angle)
+            target_orn = [axis[0] * s, axis[1] * s, axis[2] * s, c]
+
+            # adjust the constraints to move the joint
             p.changeConstraint(
                 constraint_id,
-                targetAngle = quat,
-                #jointChildFrameOrientation = quat,
-                #maxForce = 100.0,  # <---------------------------- TODO: this needs to be the right scale my guy
-                physicsClientId = self.client
+                jointChildFrameOrientation=target_orn,
+                maxForce=5000.0,
+                physicsClientId=self.client
             )
     
 
@@ -485,7 +508,7 @@ class PyBulletWorld:
             )
             
             p.resetDebugVisualizerCamera(
-                cameraDistance = 10,      
+                cameraDistance = 30,      
                 cameraYaw = 50,            
                 cameraPitch = -35,         
                 cameraTargetPosition = pos 
@@ -505,8 +528,8 @@ class PyBulletWorld:
         
         # Actuate joints
         for joint_idx, joint in enumerate(self.joint_parts):
-            if joint.motor and joint_idx < len(self.output_s2j) and \
-               joint_idx < len(self.output_n2j):
+            if (joint.motor) and (joint_idx < len(self.output_s2j)) and \
+               (joint_idx < len(self.output_n2j)):
                 # Combine outputs
                 motor_command = self.output_s2j[joint_idx] + self.output_n2j[joint_idx]
                 
