@@ -9,9 +9,16 @@ import sys
 import subprocess
 from pathlib import Path
 from collections import namedtuple
-#from simulation.python_sim.runit import run_simulation_entry
 
 import pdb
+
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from simulation.python_sim.runit import run_simulation_entry
+
 
 SimulationData = namedtuple('SimulationData', ['fitness'])
 
@@ -41,7 +48,7 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
         time.sleep(0.1)
         if time.time() - start_time > 30:
             print(f"ERROR: Timed out waiting for buffer file: {check_file}")
-            return 0.0  
+            return 0.0 
 
 
     # run in headless or headed mode
@@ -58,7 +65,7 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
             print(f"ERROR: Simulation {sim_num} hung and was forcefully terminated.")
             return 0.0
     else:
-        runit_script.run_simulation_entry(
+        run_simulation_entry(
             os.path.abspath(io_file), 
             str(sim_num), 
             str(grav), 
@@ -86,31 +93,3 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
 
     return fitness
 
-'''
-def run_simulation_graphics(io_file, sim_num, test=False, grav=-9.81):
-    """
-    Runs the simulation with GLUT-enabled graphics. Pretty much identical to 
-    run_simulation() in this file, but without the storage components (data_file)
-    and without the headless command
-    """
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    runit_script = os.path.join(base_dir, '../simulation/python_sim/runit.py')
-    
-    check_file = io_file + 'buffer_' + str(sim_num) + '.dat'
-
-    # build command to run the simulation
-    while not os.path.isfile(check_file):
-        time.sleep(0.1)
-
-    # run the simulation once using GLUT-based graphics
-    run_simulation_entry(
-        os.path.abspath(io_file),
-        sim_num,
-        grav,
-        False
-    )
-
-    os.remove(check_file)
-
-    return 0
-'''

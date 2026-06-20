@@ -40,21 +40,28 @@ def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=500)
     print()
     '''
     
+    # Build command
+    cmd = [sys.executable, str(main_script)]
+    cmd.extend(["-f", str(io_file)])
+    cmd.extend(["-n", str(sim_number)])
+    cmd.extend(["-g", str(gravity)])
+    cmd.extend(["--steps", str(steps)])
+
     if headless:
-        # Build command
-        cmd = [sys.executable, str(main_script)]
-        cmd.extend(["-f", str(io_file)])
-        cmd.extend(["-n", str(sim_number)])
-        cmd.extend(["-g", str(gravity)])
-        cmd.extend(["--steps", str(steps)])
-        cmd.append("--headless")
-    else:
-        cmd.append()
+        cmd.append("--headless")        
+
     
     # Run the simulation
     try:
         result = subprocess.run(cmd, cwd=str(script_dir))
         return result.returncode
+        '''
+        if headless:
+            result = subprocess.run(cmd, cwd=str(script_dir))
+            return result.returncode
+        else:
+            return os.system(cmd, cwd=str(script_dir))
+        '''
     except FileNotFoundError:
         print(f"ERROR: Could not find Python executable")
         return 1

@@ -299,7 +299,7 @@ def test_one_agent(pop, gen, build_er, repro_er, version, agent):
         index = db.find('.db')
         insert = ''.join((' (', str(version), ')'))
         db = ''.join((db[:index], insert, db[index:]))
-    print(db)
+    
     io_file = ''.join((make_io_file(pop, repro_er, build_er), '/'))
     genome, genome_to_build = grab_a_genome(db, gen, agent)
     filler_prng = RandomState(2)
@@ -377,13 +377,11 @@ def check_data(og, cp):
 
 
 # Single simulation. Will be multiprocessed
-def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, grav, graphics=False):
-    if graphics:
-        fitness = simulate.run_simulation(io_file, sim_num, test=True, grav=grav)
-        return fitness
+def run_one(sim_num, seeds, all_genomes, gen, build_er, repro_er, io_file, db, grav):
     
     agent_prng = RandomState(seeds[sim_num])
     genome_info = all_genomes[sim_num]
+    
     parent = genome_info[0]
     genome = genome_info[1]
     proto_parts, genome_to_build = initiate.setup_agent(genome,
@@ -461,8 +459,7 @@ def run_generations(reproduction_error_rate, build_error_rate,
                                repro_er=reproduction_error_rate,
                                db=db_name,
                                io_file=io_file,
-                               grav=grav,
-                               graphics=True)
+                               grav=grav)
         sim_pool = mp.Pool(mp.cpu_count())
         sim_pool.map(wrap_run_one, range(agents)) 
         sim_pool.close()
@@ -510,31 +507,37 @@ def run_generations(reproduction_error_rate, build_error_rate,
     return db_name
 
 
-def run_generation_graphic(grav, somaline, agent_id, total_agents, generation):
+def run_generation_graphic(grav, somaline, agent_id, total_agents):
     main_prng = RandomState(42)
-    agent_prng_seeds = (main_prng.randint(0, 1000000, total_agents+1))[agent_id]
+    agent_prng_seed = (main_prng.randint(0, 1000000, total_agents+1))[agent_id]
 
-    run_one(
-        seeds=agent_prng_seeds,
-        all_genomes=somaline,
-        gen=0,
-        build_er=0,
-        repro_er=0,
-        db=db_name,
-        io_file=io_file,
-        grav=grav,
-        graphics=False
-    )
+    io_file = ''.join((make_io_file(total_agents,
+                                    0, # 0 reproduction error
+                                    0, # 0 build error
+                                    grav),
+                       '/'))        
     
-    sim_pool = mp.Pool(mp.cpu_count())
-    sim_pool.map(wrap_run_one, range(agents)) 
-    sim_pool.close()
-    sim_pool.join()
-    fit_data, selection_genomes = grab_sim_selection_data(db_name,
-                                                            generation)
-        
-        
+    agent_prng = RandomState(agent_prng_seed)
+
+    # creating the list of parts to use in the simulation
+    # note: the develop functions are easiest for this currently because
+    # even though the error rate is 0 for test runs, its the easiest way to create
+    # a list of the appropriate parts
+    proto_parts, genome_to_build = initiate.setup_agent(somaline, 0, agent_prng)
+    parts_developed = develop.update_cycles(proto_parts)
+    frame_selection = develop.select_frame_parts(parts_developed)
+    ann_selection = develop.select_ann_parts(parts_developed,
+                                             frame_selection)
+    blueprints = blueprint.all_parts_to_send(parts_developed,
+                                             frame_selection,
+                                             ann_selection)
+    export.export_all(blueprints[0], blueprints[1], blueprints[2],
+                      blueprints[3], blueprints[4], blueprints[5],
+                      blueprints[6], agent_id, io_file)
     
+    fitness = simulate.run_simulation(io_file, agent_id, test=True, grav=grav)
+    return fitness
+        
 
 
 def export_db_to_csv(db_file):
@@ -573,9 +576,9 @@ def export_db_to_csv(db_file):
                 writer.writeheader()
                 for row in rows:
                     writer.writerow(dict(row))
-            print(f"  ✓ Exported {table_name} -> {csv_file}")
+            print(f"Exported {table_name} -> {csv_file}")
         else:
-            print(f"  ⚠ {table_name} is empty, skipping CSV export")
+            print(f"{table_name} is empty, skipping CSV export")
     
     con.close()
 
@@ -586,8 +589,7 @@ def main():
     data_dir = '../data/'
     io_dir = '../io/'
 
-    thing_to_test = str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n3. Test Simulation (with graphics)\n")).lower()
-
+    thing_to_test = "3"#str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravity\n2. Error Rate\n3. Test simulation with graphics (note: from an existing experiment))\n")).lower()
 
     if thing_to_test == "1" or thing_to_test == "2":
         if not os.path.isdir(data_dir):
@@ -599,17 +601,17 @@ def main():
         if not os.path.isfile('../data/population_genes.db'):
             make_filled_db()
 
-        pop_num = int(input("What population should be run? "))
-        gen_num = int(input("How many generations should be run? "))
+        pop_num = 20#int(input("What population should be run? "))
+        gen_num = 100#int(input("How many generations should be run? "))
         #num_trials = int(input("How many independent trials (reps) per condition? "))
         databases_to_export = []  # Track databases for CSV export
     
 
     if thing_to_test == "1":
-        rep_er = float(input(
-            "What reproduction error condition? "))
-        build_er = float(input(
-            "What build error condition? "))
+        rep_er = 0.005#float(input(
+            #"What reproduction error condition? "))
+        build_er = 0.005#float(input(
+            #"What build error condition? "))
         # Run 5 generations with incrementally increasing gravity
         gravity_values = [-4, -7, -10, -13, -16]
         for grav_val in gravity_values:
@@ -659,16 +661,23 @@ def main():
     
 
     elif thing_to_test == "3":
-        grav_val = int(input(
-            "What gravity condition? (note: this should be a negative integer) "))
-        somaline_genes = str(input(
-            "Input the somaline gene code of the trial. "))
-        num = int(input(
-            "Input the agent ID (0 is the first agent). "))
-        total = int(input(
-            "Input the total number of agents during that trial. "))
+        #str(input("Please ensure that the test file has the somaline gene code copied and pasted in."))
+
+        with open("../EVODEVO-MODELING/multi_evodevo/test.txt", "r") as file:
+            somaline_genes = file.read().strip()
+
+        grav_val = -16#int(input(
+            #"What was the gravity condition? "))
+        num = 10#int(input(
+            #"Input the agent index (ex: 0 is the first agent). "))
+        total = 20#int(input(
+            #"Input the total number of agents during that trial. "))
         fitness = run_generation_graphic(grav_val, somaline_genes, num, total)
+        print("")
+        print("="*70)
         print(f"Agent fitness = {fitness}")
+        print("="*70)
+        print("")
         return 0
 
 
@@ -678,4 +687,6 @@ def main():
 
 # Script to run 1 population through all conditions, serially
 if __name__ == '__main__':
+    # for some reason mutliprocessing was failing without freeze support :/
+    mp.freeze_support() 
     main()

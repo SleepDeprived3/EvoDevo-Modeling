@@ -15,6 +15,8 @@ import pybullet as p
 import pybullet_data
 import numpy as np
 import math
+import time
+
 
 # ---- All identified part constants ----
 UNITS_TO_RADS = math.pi
@@ -141,12 +143,15 @@ class PyBulletWorld:
             self.client = p.connect(p.DIRECT)
         else:
             self.client = p.connect(p.GUI)
+
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         
         # world parameters (gravity, timesteps, etc.)
-        p.setGravity(0, gravity, 0, physicsClientId=self.client)
-        self.dt = dt
+        p.setGravity(0, 0, gravity, physicsClientId=self.client)
         self.gravity = gravity
+
+        p.setTimeStep(dt, physicsClientId=self.client)
+        self.dt = dt
         self.time_step = 0
         
         # setting the bounds of the 3D world
@@ -194,9 +199,12 @@ class PyBulletWorld:
         ground_body = p.createMultiBody(
             baseMass = 0,
             baseCollisionShapeIndex = ground_shape,
-            basePosition = [0, 0, 0], 
+            basePosition = [0, 0, -30],  # trying this for now since the bodies keep spawning below it
             physicsClientId = self.client
         )
+
+        # setting up the collision group
+        p.setCollisionFilterGroupMask(ground_body, -1, collisionFilterGroup=1, collisionFilterMask=3, physicsClientId=self.client)
 
         # sets the ground id and contact tracking for the ground body
         self.ground_id = ground_body
@@ -242,10 +250,9 @@ class PyBulletWorld:
         )
         
         # keeping the component active and trackable for collisions
-        p.setCollisionFilterGroupMask(body_id, -1, 1, 1, physicsClientId=self.client)
-        p.changeDynamics(body_id, -1, 
-                        physicsClientId=self.client)
-        
+        # setting up the collision group
+        p.setCollisionFilterGroupMask(body_id, -1, collisionFilterGroup=2, collisionFilterMask=1, physicsClientId=self.client)
+
         # Store mapping
         self.bodies[body_part.id] = body_id
         self.body_parts.append(body_part)
@@ -332,17 +339,10 @@ class PyBulletWorld:
             -1,  # base link
             body_b_id,
             -1,  # base link
-            p.JOINT_POINT2POINT, # <------------------------------------------------------
-            jointAxis = [0, 0, 0],
+            p.JOINT_REVOLUTE,
+            jointAxis = [joint_part.ax, joint_part.ay, joint_part.az],
             parentFramePosition = loc_point_1.tolist(),
             childFramePosition = loc_point_2.tolist(),
-            physicsClientId = self.client
-        )
-
-        # Set joint limits (lower and upper)
-        p.changeConstraint(
-            constraint_id,
-            maxForce = MOTOR_MAX_IMPULSE if joint_part.motor else 0,
             physicsClientId = self.client
         )
         
@@ -352,8 +352,6 @@ class PyBulletWorld:
             'body_a': body_a_id,
             'body_b': body_b_id,
             'motor_enabled': joint_part.motor,
-            'lower': joint_part.lower_limit,
-            'upper': joint_part.upper_limit,
             'axis': np.array([joint_part.ax, joint_part.ay, joint_part.az])
         }
         self.joint_parts.append(joint_part)
@@ -372,13 +370,19 @@ class PyBulletWorld:
         """
         Apply motor command to joint
         """
-        if joint_id in self.joints and self.joints[joint_id]['motor_enabled']:
-            constraint = self.joints[joint_id]['constraint_id']
-            # Set target angle for motor control with timestep
+        if (joint_id in self.joints) and (self.joints[joint_id]['motor_enabled']):
+            constraint_id = self.joints[joint_id]['constraint_id']
+            axis = self.joints[joint_id]['axis']
+            
+            # Convert target angle along the structural axis into a quaternion orientation
+            quat = p.getQuaternionFromAxisAngle(axis.tolist(), float(desired_angle))
+            
+            # Adjust constraint orientation dynamically
             p.changeConstraint(
-                constraint,
-                targetPosition = desired_angle,
-                maxForce = MOTOR_MAX_IMPULSE,
+                constraint_id,
+                targetAngle = quat,
+                #jointChildFrameOrientation = quat,
+                #maxForce = 100.0,  # <---------------------------- TODO: this needs to be the right scale my guy
                 physicsClientId = self.client
             )
     
@@ -440,14 +444,15 @@ class PyBulletWorld:
                         body_part = bp
                         break
                 
-                if body_part:
-                    # Get contact point (world coordinates)
-                    contact_point = self.contact_callback.touches_point[sensor_body_id]
+                if body_part:                    
+                    # global contact points
+                    contact_point_world = self.contact_callback.touches_point[sensor_body_id]
+    
+                    # Get contact point (local coordinates)
+                    contact_point = self.PointWorldToLocal(body_part.id, contact_point_world)
                     
-                    # C++ logic: check if contact point is within axis-aligned box
-                    # sensor position = (sensor.x * body_size, sensor.y * body_size, sensor.z * body_size)
-                    # check if contact is within [sensor_pos +/- sensor_radius] for each axis
                     body_size = body_part.size
+                    sensor_x = sensor.x * body_size
                     sensor_x = sensor.x * body_size
                     sensor_y = sensor.y * body_size
                     sensor_z = sensor.z * body_size
@@ -464,10 +469,27 @@ class PyBulletWorld:
 
 
 
-    def step(self):
+    def step(self, headless=True):
         """Advance simulation by one timestep and process control"""
         # Check collisions
         self.contact_callback.check_collisions(self.client)
+
+        # move camera if in GUI mode
+        if (not headless) and (len(self.bodies) > 0):
+            
+            # Get first body position (same as what I did for save position)
+            first_body_id = self.bodies[0]
+            pos, _ = p.getBasePositionAndOrientation(
+                first_body_id,
+                physicsClientId=self.client
+            )
+            
+            p.resetDebugVisualizerCamera(
+                cameraDistance = 10,      
+                cameraYaw = 50,            
+                cameraPitch = -35,         
+                cameraTargetPosition = pos 
+            )
         
         # Step physics
         p.stepSimulation(physicsClientId=self.client)

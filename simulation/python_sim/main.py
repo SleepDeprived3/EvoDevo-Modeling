@@ -9,6 +9,8 @@ import argparse
 from pathlib import Path
 import numpy as np
 import os
+import time
+import pybullet as p
 
 from physics_engine_MULTI import PyBulletWorld, BodyPart, JointPart, SensorPart
 
@@ -116,7 +118,7 @@ def build_blueprint_filenames(io_file, sim_number):
 
 
 
-def run_simulation(io_file, sim_number, gravity, headless=True, max_steps=500):
+def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=500):
     """Run the PyBullet physics simulation"""
     
     '''
@@ -151,8 +153,9 @@ def run_simulation(io_file, sim_number, gravity, headless=True, max_steps=500):
     #print(f"  ANN weights loaded")
     #print()
     
-    # Initialize world
+    # Initialize world (either in graphics or headless mode)
     world = PyBulletWorld(gravity=gravity, headless=headless)
+
     world.weights_s2n = weights_s2n
     world.weights_n2n = weights_n2n
     world.weights_s2j = weights_s2j
@@ -173,16 +176,24 @@ def run_simulation(io_file, sim_number, gravity, headless=True, max_steps=500):
     #print(f"  {len(joints)} joints created")
     #print(f"  {len(sensors)} sensors added")
     #print()
+
+    if not headless:        
+        # Disable GUI panel clutter (optional, makes it look cleaner)
+        p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
+        # Safely enable single-step rendering now that everything is loaded
+        # p.configureDebugVisualizer(p.COV_ENABLE_SINGLE_STEP_RENDERING, 1)
     
     # Run simulation
-    # Run simulation (0 to max_steps inclusive = max_steps + 1 total steps, matching C++ while loop)
-    #print(f"Running simulation for {max_steps + 1} timesteps (0-{max_steps})...")
+    # Run simulation (0 to max_steps inclusive = max_steps + 1 total steps)
     for step in range(max_steps + 1):
-        world.step()
+
+        if not headless:
+            world.step(headless=False)
+            time.sleep(world.dt)
         
-        #if (step + 1) % 50 == 0:
-            #print(f"  Step {step + 1}/{max_steps + 1}")
-            #pass
+        else:
+            world.step()
+                
     
     #print("Simulation complete!")
     #print()
@@ -236,7 +247,7 @@ def main():
     )
     
     args = parser.parse_args()
-    
+
     return run_simulation(
         io_file=args.file,
         sim_number=args.number,
