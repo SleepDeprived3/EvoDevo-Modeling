@@ -22,6 +22,9 @@ def load_blueprints_from_file(filename, file_type): ###
     and returns them as a list of the appropriate part objects.
     """
     results = []
+    body_count = 0
+    sensor_count = 0
+    joint_count = 0
     
     if not Path(filename).exists():
         print(f"Warning: Blueprint file {filename} not found")
@@ -42,6 +45,7 @@ def load_blueprints_from_file(filename, file_type): ###
                     z = float(parts[3]),
                     size = float(parts[4])
                 )
+                body_count = body_count + 1
                 results.append(body)
             
             elif file_type == "joint":
@@ -60,6 +64,7 @@ def load_blueprints_from_file(filename, file_type): ###
                     upper_limit = float(parts[10]),
                     motor = (parts[11].strip() == 'T')
                 )
+                joint_count = joint_count + 1
                 results.append(joint)
             
             elif file_type == "sensor":
@@ -71,8 +76,13 @@ def load_blueprints_from_file(filename, file_type): ###
                     y = float(parts[3]),
                     z = float(parts[4])
                 )
+                sensor_count = sensor_count + 1
                 results.append(sensor)
-    
+    print("")
+    print("sensors : " + str(sensor_count))
+    print("bodies : " + str(body_count))
+    print("joints : " + str(joint_count))
+    print("")
     return results
 
 
@@ -121,37 +131,17 @@ def build_blueprint_filenames(io_file, sim_number):
 def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000):
     """Run the PyBullet physics simulation"""
     
-    '''
-    print("=" * 70)
-    print("EvoDevo PyBullet Physics Simulation")
-    print("=" * 70)
-    print(f"Simulation #: {sim_number}")
-    print(f"Config file: {io_file}")
-    print(f"Gravity: {gravity}")
-    print(f"Headless: {headless}")
-    print("=" * 70)
-    print()
-    '''
-    
-    # Load blueprints
+    # load blueprints / bodies / weights
     files = build_blueprint_filenames(io_file, sim_number)
     
-    #print("Loading blueprints...")
     bodies = load_blueprints_from_file(files['body'], 'body')
     joints = load_blueprints_from_file(files['joint'], 'joint')
     sensors = load_blueprints_from_file(files['sensor'], 'sensor')
-    
-    #print(f"  Bodies: {len(bodies)}")
-    #print(f"  Joints: {len(joints)}")
-    #print(f"  Sensors: {len(sensors)}")
     
     weights_s2n = load_matrix_from_file(files['s2n'])
     weights_n2n = load_matrix_from_file(files['n2n'])
     weights_s2j = load_matrix_from_file(files['s2j'])
     weights_n2j = load_matrix_from_file(files['n2j'])
-    
-    #print(f"  ANN weights loaded")
-    #print()
     
     # Initialize world (either in graphics or headless mode)
     world = PyBulletWorld(gravity=gravity, headless=headless)
@@ -161,48 +151,34 @@ def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000)
     world.weights_s2j = weights_s2j
     world.weights_n2j = weights_n2j
     
+    print("building")
+
     # Create bodies and joints
     #print("Creating physics objects...")
-    for body in bodies:
-        world.create_body(body)
+    world.create_robot(bodies, joints, sensors)
     
-    for joint in joints:
-        world.create_joint(joint)
-    
+    '''
+    # creating sensors
     for sensor in sensors:
         world.add_sensor(sensor)
-    
-    #print(f"  {len(bodies)} bodies created")
-    #print(f"  {len(joints)} joints created")
-    #print(f"  {len(sensors)} sensors added")
-    #print()
+    '''
 
     if not headless:        
-        # Disable GUI panel clutter (optional, makes it look cleaner)
+        # disable GUI panel clutter (optional, makes it look cleaner)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
-        # Safely enable single-step rendering now that everything is loaded
-        # p.configureDebugVisualizer(p.COV_ENABLE_SINGLE_STEP_RENDERING, 1)
     
-    # Run simulation
-    # Run simulation (0 to max_steps inclusive = max_steps + 1 total steps)
+    # run simulation for all steps
     for step in range(max_steps + 1):
-
         if not headless:
             world.step(headless=False)
             time.sleep(world.dt)
         
         else:
             world.step()
-                
-    
-    #print("Simulation complete!")
-    #print()
     
     # Save final position
     output_file = os.path.join(os.path.abspath(io_file), f'sim_{sim_number}.dat')
-    distance = world.save_position(output_file, completed=True)
-    #print(f"Final distance: {distance:.6f}")
-    #print(f"Saved to: {output_file}")
+    world.save_position(output_file, completed=True)
 
     
     # Cleanup

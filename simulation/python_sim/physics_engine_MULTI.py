@@ -16,6 +16,7 @@ import pybullet_data
 import numpy as np
 import math
 import time
+from collections import deque
 
 
 # ---- All identified part constants ----
@@ -46,6 +47,8 @@ DT = 1.0 / 60.0
 # originally from - NoiseWorld.h
 # Note: C++ version had methods for each part called readBlueprint() and printSelf()
 #       these have been replaced with the new load_blueprints_from_file() method in main.py.
+
+
 class BodyPart: ###
     """
     Represents a rigid body (sphere) in the simulation
@@ -103,27 +106,30 @@ class ContactCallback:
 
     def check_collisions(self, physics_client):
         """Check all collisions and update body_touches"""
-        num_contacts = len(p.getContactPoints(physicsClientId = physics_client))
+        contacts = (p.getContactPoints(physicsClientId = physics_client))
         
-        # Reset all touches
+        # reset all contacts
         for body_id in self.body_touches:
             self.body_touches[body_id] = 0
             self.touches_point[body_id] = np.array([0.0, 0.0, 0.0])
         
-        # Process all contacts
-        for i in range(num_contacts):
-            contact = p.getContactPoints(physicsClientId=physics_client)[i]
+        # process current contacts
+        for contact in contacts:
+
+            # finding the bodies and links that are contacting + the position on each body that is beng contacted
             body_id_a = contact[1]
             body_id_b = contact[2]
-            contact_point_a = np.array(contact[5])  # positionOnA
-            contact_point_b = np.array(contact[6])  # positionOnB
+            link_index_a = contact[3]
+            link_index_b = contact[4]
+            contact_point_a = np.array(contact[5]) 
+            contact_point_b = np.array(contact[6])
             
-            if body_id_a in self.body_touches:
-                self.body_touches[body_id_a] = 1
-                self.touches_point[body_id_a] = contact_point_a
-            if body_id_b in self.body_touches:
-                self.body_touches[body_id_b] = 1
-                self.touches_point[body_id_b] = contact_point_b
+            # map tracking directly to unique (body, link) configurations <--------------------- TODO:
+            self.body_touches[(body_id_a, link_index_a)] = 1
+            self.touches_point[(body_id_a, link_index_a)] = contact_point_a
+            
+            self.body_touches[(body_id_b, link_index_b)] = 1
+            self.touches_point[(body_id_b, link_index_b)] = contact_point_b
 
 
 
@@ -158,7 +164,7 @@ class PyBulletWorld:
         self.world_aabb_min = [-10000, -10000, -10000]
         self.world_aabb_max = [10000, 10000, 10000]
         
-        # setting up dictionaries to tie part ids with their Pybullet ids
+        # setting up dictionaries to tie part ids with their Pybullet ids # TODO: Has now been fricken made superfluous
         self.bodies = {} 
         self.joints = {}  
         # setting up the lists of all physical robot structures
@@ -181,6 +187,8 @@ class PyBulletWorld:
         self.output_n2n = []
         self.output_s2j = []
         self.output_n2j = []
+
+        self.robot_id = None
         
         # creating a ground plane (defined in the following function)
         self.create_ground()
@@ -199,7 +207,7 @@ class PyBulletWorld:
         ground_body = p.createMultiBody(
             baseMass = 0,
             baseCollisionShapeIndex = ground_shape,
-            basePosition = [0, 0, -30],  # trying this for now since the bodies keep spawning below it
+            basePosition = [0, 0, -10],  # trying this for now since the bodies keep spawning below it
             physicsClientId = self.client
         )
 
@@ -212,178 +220,269 @@ class PyBulletWorld:
         self.contact_callback.touches_point[ground_body] = np.array([0.0, 0.0, 0.0])
     
 
-    def create_body(self, body_part): ###
+    # ---------- SPAWNING ALL THE PARTS ---------
+    def create_robot(self, body_blueprints, joint_blueprints, sensor_blueprints=[]):
         """
-        Create a rigid body sphere in the simulation
+        Assembles a single robot structure out of individual 
+        body and joint blueprints using reduced-coordinate multibodies.
         """
-        # finding the size from the body part's variable
-        size = body_part.size
-        
-        # calculate volume from:  (4/3) * size^3 * pi
-        volume = (4.0 / 3.0) * size * size * size * math.pi
-        mass = volume * DENSITY
-        
-        # create sphere collision shape
-        shape = p.createCollisionShape(
-            p.GEOM_SPHERE,
-            radius=size,
-            physicsClientId=self.client
-        )
-        
-        # create rigid body
-        body_id = p.createMultiBody(
-            baseMass=mass,
-            baseCollisionShapeIndex=shape,
-            basePosition=[body_part.x, body_part.y, body_part.z],
-            physicsClientId=self.client
-        )
-        
-        # set physics properties (fricion, damping)
-        p.changeDynamics(
-            body_id,
-            -1,  # referring to the original body itself (not a link)
-            lateralFriction=FRICTION,
-            rollingFriction=ROLLING_FRICTION,
-            linearDamping=0.0,
-            angularDamping=0.0,
-            physicsClientId=self.client
-        )
-        
-        # keeping the component active and trackable for collisions
-        # setting up the collision group
-        p.setCollisionFilterGroupMask(body_id, -1, collisionFilterGroup=2, collisionFilterMask=1, physicsClientId=self.client)
 
-        # Store mapping
-        self.bodies[body_part.id] = body_id
-        self.body_parts.append(body_part)
-        
-        # Initialize touch tracking
-        self.contact_callback.body_touches[body_id] = 0
-        self.contact_callback.touches_point[body_id] = np.array([0.0, 0.0, 0.0])
-        #-------
+        # ----------- The base body ------------
 
-        return body_id
-    
+        # end if there is no base
+        if not body_blueprints:
+            return None
+        
+        # trying something new here... graph tree
+        # making a dict of body id's which have values of each body + a similar dict which uses empty lists as the value
+        body_map = {b.id: b for b in body_blueprints}
+        adjacency_list = {b.id: [] for b in body_blueprints}
 
-    def PointWorldToLocal(self, bodyIndex, point): ###
-        """
-        Convert a point from world coordinates to local coordinates for a given body
-        """
-        # get the body's position and orientation
-        pos, orientation = p.getBasePositionAndOrientation(
-            self.bodies[bodyIndex],
-            physicsClientId=self.client
-        )
-        
-        # invert the transform (gets inverse position and orientation)
-        inv_pos, inv_orn = p.invertTransform(pos, orientation)
-        
-        # apply inverse transform to the point (includes both rotation and translation)
-        point_local = np.array(p.multiplyTransforms(inv_pos, inv_orn, point, [0, 0, 0, 1])[0])
-        
-        return point_local
-    
-
-    def AxisWorldToLocal(self, bodyIndex, axis): ###
-        """
-        Convert an axis from world coordinates to local coordinates for a given body
-        """
-        # get the body's position and orientation
-        _, orientation = p.getBasePositionAndOrientation(
-            self.bodies[bodyIndex],
-            physicsClientId=self.client
-        )
-        
-        # invert the vector to get the inverse rotation
-        inv_orientation = p.invertTransform([0, 0, 0], orientation)[1]
-        
-        # apply inverse rotation to convert from world to local coordinates
-        axis_local = p.rotateVector(inv_orientation, axis)
-        
-        return axis_local
+        # if a base body is in the adjacency list, add the attached joint to the dict value list
+        for joint in joint_blueprints:
+            if joint.base_body in adjacency_list:
+                adjacency_list[joint.base_body].append(joint)
 
 
-    def _debug_constraint(self, body_a_id, body_b_id):
-        num_bodies = p.getNumBodies(physicsClientId=self.client)
-        valid_ids = [p.getBodyUniqueId(i, physicsClientId=self.client) 
-                    for i in range(num_bodies)]
-        
-        print(f"Valid body IDs in world: {valid_ids}")
-        print(f"body_a_id={body_a_id} valid={body_a_id in valid_ids}")
-        print(f"body_b_id={body_b_id} valid={body_b_id in valid_ids}")
-        print(f"Same body? {body_a_id == body_b_id}")
-        
-        for bid in [body_a_id, body_b_id]:
-            num_links = p.getNumJoints(bid, physicsClientId=self.client)
-            print(f"  Body {bid} has {num_links} joints/links")
-    
-    def create_joint(self, joint_part):
-        """
-        Create a hinge constraint between two bodies
-        Converts world coordinates to local coordinates to match C++ behavior
-        """
-        body_a_id = self.bodies[joint_part.base_body]
-        body_b_id = self.bodies[joint_part.other_body]
-        
-        # World coordinates from joint blueprint
-        position = np.array([joint_part.px, joint_part.py, joint_part.pz])
-        
-        # Convert to local coordinates for each body (matching C++ CreateHinge)
-        loc_point_1 = self.PointWorldToLocal(joint_part.base_body, position)
-        loc_point_2 = self.PointWorldToLocal(joint_part.other_body, position)
-        
-        # adding in a little bit of extra wiggle room for joints to move
-        magnitude_1 = np.linalg.norm(loc_point_1)
-        magnitude_2 = np.linalg.norm(loc_point_2)
-        offset = 0.05
-        # add a clearance offset along that vector direction
-        if magnitude_1 > 0:
-            direction_1 = loc_point_1 / magnitude_1
-            loc_point_1 = loc_point_1 + (direction_1 * offset)
-        if magnitude_2 > 0:
-            direction_2 = loc_point_2 / magnitude_2
-            loc_point_2 = loc_point_2 + (direction_2 * offset)
+        # map out all children to find the root
+        child_ids = {joint.other_body for joint in joint_blueprints}
+        # find at least one body that is never a child
+        base_blueprint = None
+        for b in body_blueprints:
+            if b.id not in child_ids:
+                base_blueprint = b
+                break    
+        # fallback to the first body if no child is found
+        if base_blueprint is None:
+            base_blueprint = body_blueprints[0]
 
-        # Create hinge constraint with local coordinates
-        constraint_id = p.createConstraint(
-            body_a_id,
-            -1,  # base link
-            body_b_id,
-            -1,  # base link
-            p.JOINT_POINT2POINT,
-            jointAxis = [joint_part.ax, joint_part.ay, joint_part.az],
-            parentFramePosition = loc_point_1.tolist(),
-            childFramePosition = loc_point_2.tolist(),
+        
+        # calculate base body mass/volume (sphere = 4/3 * size^3 * pi)
+        base_size = base_blueprint.size
+        base_volume = (4.0 / 3.0) * base_size * base_size * base_size * math.pi
+        base_mass = base_volume * DENSITY
+        
+        print(f"DEBUG: Selected Base ID: {base_blueprint.id} (Type: {type(base_blueprint.id)})")
+        print(f"DEBUG: Adjacency list keys: {list(adjacency_list.keys())}")
+        print(f"DEBUG: Children of Base: {adjacency_list[base_blueprint.id]}")
+        
+        # create a collision shape and visual shape for the base body
+        base_col_id = p.createCollisionShape(
+            p.GEOM_SPHERE, 
+            radius = base_size,
             physicsClientId = self.client
         )
-
-        # collision boundary since clipping keeps happening between bodies
-        p.setCollisionFilterPair(
-            bodyUniqueIdA = body_a_id,
-            bodyUniqueIdB = body_b_id,
-            linkIndexA = -1,
-            linkIndexB = -1,
-            enableCollision = 1, # 1 explicitly activates physical boundaries
+        base_vis_id = p.createVisualShape(
+            p.GEOM_SPHERE, 
+            radius = base_size,
             physicsClientId = self.client
         )
         
-        # Store joint
-        self.joints[joint_part.id] = {
-            'constraint_id': constraint_id,
-            'body_a': body_a_id,
-            'body_b': body_b_id,
-            'motor_enabled': joint_part.motor,
-            'axis': np.array([joint_part.ax, joint_part.ay, joint_part.az])
-        }
-        self.joint_parts.append(joint_part)
+        # set the base body to position 0,0,0
+        base_pos = [base_blueprint.x, base_blueprint.y, base_blueprint.z]
+        base_orn = [0, 0, 0, 1]
 
 
+        # ----------- The non-bass bodies ------------
+
+        # preparing body lists
+        link_masses = []
+        link_collision_shapes = []
+        link_visual_shapes = []
+        link_positions = []        # (local offset relative to parent frame)
+        link_orientations = []     # (local orientation relative to parent frame)
+        link_parent_indices = [] 
+        link_joint_types = []    # all are just p.JOINT_REVOLUTE, but we need a fricken list man
+        link_joint_axes = []     # Hinge axis vector
+        link_inertial_positions = []      # inertial tracking and orientations
+        link_inertial_orientations = []
+
+        # defining the self variables
+        self.bodies = {base_blueprint.id: -1} 
+        self.joint_indices_map = {}
+        self.joint_parts = []
+        self.body_parts = body_blueprints
+        self.sensors = sensor_blueprints 
+
+        # using a queue to iterate through the link tree
+        queue = deque([base_blueprint.id])
+
+        while queue:
+            # removes the first item from the queue (the parent)
+            parent_id = queue.popleft()
+            
+            # find the adjancy list of the parent to find the nearby bodies
+            for joint in adjacency_list[parent_id]:
+                child_id = joint.other_body
+                if child_id in self.bodies:
+                    continue 
+                
+                # find the blueprint of the unencountered child body
+                child_blueprint = body_map[child_id]
+                parent_blueprint = body_map[parent_id]
+                
+                # Set the body id to the last value in the self.bodies / self.joints lists
+                self.bodies[child_id] = len(link_masses)
+                self.joint_indices_map[joint.id] = len(link_masses)
+                joint.blueprint_idx = joint_blueprints.index(joint) 
+                self.joint_parts.append(joint)
+                
+
+
+                # add physics values
+                child_volume = (4.0 / 3.0) * (child_blueprint.size ** 3) * math.pi
+                link_masses.append(child_volume * DENSITY)
+                # adding collision shapes and graphics shapes
+                col_id = p.createCollisionShape(
+                    p.GEOM_SPHERE, 
+                    radius=child_blueprint.size, 
+                    physicsClientId=self.client
+                )
+                vis_id = p.createVisualShape(
+                    p.GEOM_SPHERE, 
+                    radius=child_blueprint.size, 
+                    physicsClientId=self.client
+                )
+                # adding the physics values to the body lists
+                link_collision_shapes.append(col_id)
+                link_visual_shapes.append(vis_id)
+
+
+                # finding the pivot locations
+                parent_com = np.array([parent_blueprint.x, parent_blueprint.y, parent_blueprint.z])
+                child_com = np.array([child_blueprint.x, child_blueprint.y, child_blueprint.z])
+                local_offset = child_com - parent_com
+
+                # defining the link oritentation and center of mass <--------TODO:
+                link_positions.append(local_offset.tolist())
+                link_orientations.append([0, 0, 0, 1])
+                link_inertial_positions.append([0.0, 0.0, 0.0])        
+                link_inertial_orientations.append([0.0, 0.0, 0.0, 1.0])
+                
+                # shifting body indexes since we start at index -1 for the basee
+                parent_link_idx = self.bodies[parent_id]
+                if parent_link_idx == -1:
+                    link_parent_indices.append(0)  
+                else:
+                    link_parent_indices.append(parent_link_idx + 1)
+
+                # setting up everything as a Revolute joint TODO: make sure this one freaking works now
+                link_joint_types.append(p.JOINT_REVOLUTE) 
+                link_joint_axes.append([joint.ax, joint.ay, joint.az])
+
+                queue.append(child_id)
+
+
+        # create the entire robot multibody
+        self.robot_id = p.createMultiBody(
+            # base properties
+            baseMass = base_mass,
+            baseCollisionShapeIndex = base_col_id,
+            baseVisualShapeIndex = base_vis_id,
+            basePosition = base_pos,
+            baseOrientation = base_orn,
+
+            # link properties (with child objects attached)
+            linkMasses = link_masses,
+            linkCollisionShapeIndices = link_collision_shapes,
+            linkVisualShapeIndices = link_visual_shapes,
+            linkPositions = link_positions,
+            linkOrientations = link_orientations,
+            linkInertialFramePositions = link_inertial_positions, 
+            linkInertialFrameOrientations = link_inertial_orientations,
+            linkParentIndices = link_parent_indices,
+            linkJointTypes = link_joint_types,
+            linkJointAxis = link_joint_axes,
+
+            # client again
+            physicsClientId = self.client
+        )
+        
+        # surface properties for every sub-link
+        for link_idx in range(-1, len(link_masses)):
+            p.changeDynamics(
+                self.robot_id, link_idx,
+                lateralFriction = FRICTION,
+                rollingFriction = ROLLING_FRICTION,
+                physicsClientId = self.client
+            )
+            
+        return self.robot_id
+    
     
     def add_sensor(self, sensor_part): #<----------------------------------------------------------DO I NEED
         """
         Add a touch sensor to a body
         """
         self.sensors.append(sensor_part)
+    
+
+    def PointWorldToLocal(self, bodyIndex, point): ###
+        """
+        Convert a point from world coordinates to local coordinates for a given body
+        """
+        if bodyIndex in self.bodies:
+            # find the body index
+            link_idx = self.bodies[bodyIndex]
+
+            # if the body is the base body
+            if link_idx == -1:
+                position, orientation = p.getBasePositionAndOrientation(
+                    self.robot_id, 
+                    physicsClientId=self.client
+                )
+            # if the body is a child body
+            else:
+                state = p.getLinkState(
+                    self.robot_id, 
+                    link_idx, 
+                    physicsClientId=self.client
+                )
+                position, orientation = state[4], state[5] # worldLinkFramePosition, worldLinkFrameOrientation
+            
+            # invert the transform (gets inverse position and orientation)
+            inv_pos, inv_orn = p.invertTransform(position, orientation)
+
+            # apply inverse transform to the point (includes both rotation and translation)
+            point_local = np.array(p.multiplyTransforms(inv_pos, inv_orn, point, [0, 0, 0, 1])[0])
+            return point_local
+        
+        return np.array([0.0, 0.0, 0.0]) # surely returning zeros like this in null cases will have no unintended consequences
+
+
+    
+
+    def AxisWorldToLocal(self, bodyIndex, axis): ###
+        """
+        Convert an axis from world coordinates to local coordinates for a given body
+        """
+        if bodyIndex in self.bodies:
+            # find the link index
+            link_idx = self.bodies[bodyIndex]
+
+            # for the base body
+            if link_idx == -1:
+                _, orientation = p.getBasePositionAndOrientation(
+                    self.robot_id, 
+                    physicsClientId = self.client
+                )
+            
+            # for all child bodies
+            else:
+                state = p.getLinkState(
+                    self.robot_id, 
+                    link_idx, 
+                    physicsClientId = self.client
+                )
+                orientation = state[5]
+
+            # invert the vector to get the inverse rotation
+            inv_orientation = p.invertTransform([0, 0, 0], orientation)[1]
+
+            # apply inverse rotation to convert from world to local coordinates
+            axis_local = p.rotateVector(inv_orientation, axis)
+            return axis_local
+        return axis
 
 
     
@@ -391,24 +490,15 @@ class PyBulletWorld:
         """
         Apply motor command to joint
         """
-        if (joint_id in self.joints) and (self.joints[joint_id]['motor_enabled']):
-            constraint_id = self.joints[joint_id]['constraint_id']
-            axis = self.joints[joint_id]['axis']
-            
-            # calculate a quaternion (4-degree expression containing the magnitude, and 3 axis values)
-            half_angle = desired_angle / 2.0
-            s = np.sin(half_angle)
-            c = np.cos(half_angle)
-            target_orn = [axis[0] * s, axis[1] * s, axis[2] * s, c]
-
-            # adjust the constraints to move the joint
-            p.changeConstraint(
-                constraint_id,
-                jointChildFrameOrientation=target_orn,
-                maxForce=5000.0,
-                physicsClientId=self.client
-            )
-    
+        # moving the correct joint on the robot to the desired angle
+        p.setJointMotorControl2(
+            bodyUniqueId = self.robot_id,
+            jointIndex = joint_id,
+            controlMode = p.POSITION_CONTROL,
+            targetPosition = desired_angle,
+            force = 200.0, # <----------------------------------------------
+            physicsClientId = self.client
+        )
 
 
     def calculate_layer(self, weights, data_in): ###
@@ -453,29 +543,28 @@ class PyBulletWorld:
         """
         self.sensor_touches = [0] * len(self.sensors)
         
+        # for all sensors...
         for sensor_idx, sensor in enumerate(self.sensors):
             sensor_body_id = self.bodies[sensor.body_id]
-            
-            # Check if body is touching
-            if sensor_body_id in self.contact_callback.body_touches and \
-               self.contact_callback.body_touches[sensor_body_id] == 1:
+
+            # body/sensor key
+            tracking_key = (self.robot_id, sensor_body_id)
+
+            # check if body is touching
+            if (tracking_key in self.contact_callback.body_touches) \
+            and (self.contact_callback.body_touches[tracking_key] == 1):
                 
-                # Find the body part
-                body_part = None
-                for bp in self.body_parts:
-                    if self.bodies[bp.id] == sensor_body_id:
-                        body_part = bp
-                        break
+                # if it is and the part is a sensor, use it for the following functions
+                body_part = next((part for part in self.body_parts if part.id == sensor.body_id), None)
                 
                 if body_part:                    
                     # global contact points
-                    contact_point_world = self.contact_callback.touches_point[sensor_body_id]
+                    contact_point_world = self.contact_callback.touches_point[tracking_key]
     
                     # Get contact point (local coordinates)
                     contact_point = self.PointWorldToLocal(body_part.id, contact_point_world)
                     
                     body_size = body_part.size
-                    sensor_x = sensor.x * body_size
                     sensor_x = sensor.x * body_size
                     sensor_y = sensor.y * body_size
                     sensor_z = sensor.z * body_size
@@ -501,9 +590,8 @@ class PyBulletWorld:
         if (not headless) and (len(self.bodies) > 0):
             
             # Get first body position (same as what I did for save position)
-            first_body_id = self.bodies[0]
             pos, _ = p.getBasePositionAndOrientation(
-                first_body_id,
+                self.robot_id,
                 physicsClientId=self.client
             )
             
@@ -528,32 +616,70 @@ class PyBulletWorld:
         
         # Actuate joints
         for joint_idx, joint in enumerate(self.joint_parts):
-            if (joint.motor) and (joint_idx < len(self.output_s2j)) and \
-               (joint_idx < len(self.output_n2j)):
-                # Combine outputs
-                motor_command = self.output_s2j[joint_idx] + self.output_n2j[joint_idx]
+            if (joint.id in self.joint_indices_map):
+                # 1. Fetch the correct PyBullet link/joint index
+                pybullet_joint_idx = self.joint_indices_map[joint.id]
                 
-                # Apply tanh activation
-                motor_command = self.tanh(motor_command)
+                # 2. Calculate or override your motor commands
+                motor_command = 0.0
+                if joint_idx < len(self.output_n2j):
+                    motor_command = self.output_s2j[joint_idx] + self.output_n2j[joint_idx]
+                    motor_command = self.tanh(motor_command) * UNITS_TO_RADS
+                    print("motor = " + str(motor_command))
                 
-                # Convert to radians
-                motor_command = motor_command * UNITS_TO_RADS
+                # Test Wave Generator Override
+                if motor_command == 0.0:
+                    motor_command = math.sin(self.time_step * 0.05) * (45 * (math.pi / 180))
                 
-                # Actuate joint with timestep (matching C++ ActuateJoint(index, angle, dt))
-                self.actuate_joint(joint.id, motor_command, self.dt)
+                # 3. Pass the sequential PyBullet index instead of joint.id
+                self.actuate_joint(pybullet_joint_idx, motor_command, self.dt)
+                '''
+                # find the neural net index
+                nn_index = joint.blueprint_idx
+
+                if nn_index < len(self.output_s2j) and nn_index < len(self.output_n2j):
+                    # Combine outputs
+                    motor_command = self.output_s2j[nn_index] + self.output_n2j[nn_index]
+                    # Apply tanh activation
+                    motor_command = self.tanh(motor_command)
+                    # Convert to radians
+                    motor_command = motor_command * UNITS_TO_RADS
+                else:
+                    motor_command = 0.0
+                
+                # map joint actuation to the link index
+                pybullet_joint_index = self.joint_indices_map[joint.id]
+                self.actuate_joint(self.robot_id, pybullet_joint_index, motor_command, self.dt)
+                '''
         
         self.time_step += 1
     
 
 
     def get_body_position(self, body_id):
-        """Get position of a body"""
+        """Get position of a body inside the robot multibody"""
         if body_id in self.bodies:
-            pos, _ = p.getBasePositionAndOrientation(
-                self.bodies[body_id],
-                physicsClientId=self.client
-            )
-            return pos
+            # find the body index
+            index = self.bodies[body_id]
+
+            # if the body is the base body
+            if index == -1:
+                position, _ = p.getBasePositionAndOrientation(
+                    self.robot_id, 
+                    physicsClientId=self.client
+                )
+
+            # if the body is a child body
+            else:
+                link_state = p.getLinkState(
+                    self.robot_id,
+                    index,
+                    physicsClientId=self.client
+                )
+                position = link_state[0]
+
+            # return the position
+            return position
         return None
     
 
@@ -564,11 +690,10 @@ class PyBulletWorld:
         Only calculates distance if completed flag is True
         """
         distance = 0.0
-        if len(self.bodies) > 0 and completed:
+        if self.robot_id is not None and completed:
             # Get first body position
-            first_body_id = self.bodies[0]
             pos, _ = p.getBasePositionAndOrientation(
-                first_body_id,
+                self.robot_id,
                 physicsClientId=self.client
             )
             

@@ -666,7 +666,7 @@ def main():
         with open("../EVODEVO-MODELING/multi_evodevo/test.txt", "r") as file:
             somaline_genes = file.read().strip()
 
-        grav_val = -7#int(input(
+        grav_val = -16#int(input(
             #"What was the gravity condition? "))
         num = 1#int(input(
             #"Input the agent index (ex: 0 is the first agent). "))
