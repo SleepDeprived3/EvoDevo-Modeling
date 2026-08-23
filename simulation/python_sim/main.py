@@ -62,7 +62,7 @@ def load_blueprints_from_file(filename, file_type): ###
                     az = float(parts[8]),
                     lower_limit = float(parts[9]),
                     upper_limit = float(parts[10]),
-                    motor = (parts[11].strip() == 'T')
+                    motor = (parts[11])
                 )
                 joint_count = joint_count + 1
                 results.append(joint)

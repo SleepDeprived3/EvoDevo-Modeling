@@ -27,11 +27,11 @@ FRICTION = 0.8
 ROLLING_FRICTION = 0.5
 MOTOR_MAX_IMPULSE = 0.4
 DT = 1.0 / 60.0
+MOTOR_MAX_FORCE = 500.0 #50.0  
 
 
 # Still trying to figure out
 # 1. what about matrix blueprints? (see UseMatrixBlueprints() in NoiseWorld.h)
-# 2. why choose 1.9098593171 for density? (see NoiseWorld.cpp line 28)
 # 3. should the ground plane be at y=-2 like it was in the C++ simulation? I have set it to 0 for now... is this problematic?
 # 4. do i need to add in delete functions if turning off the simulation effectively ends/deletes everything
 # 5. is add_sensor() necessary
@@ -207,7 +207,7 @@ class PyBulletWorld:
         ground_body = p.createMultiBody(
             baseMass = 0,
             baseCollisionShapeIndex = ground_shape,
-            basePosition = [0, 0, -10],  # trying this for now since the bodies keep spawning below it
+            basePosition = [0, 0, 0],  # trying this for now since the bodies keep spawning below it
             physicsClientId = self.client
         )
 
@@ -282,6 +282,12 @@ class PyBulletWorld:
         base_pos = [base_blueprint.x, base_blueprint.y, base_blueprint.z]
         base_orn = [0, 0, 0, 1]
 
+        # shift the entire robot up so the lowest sphere clears the ground (z=0)
+        # (only adjusting the base since all other positions are relative to the base)
+        min_z = min(b.z - b.size for b in body_blueprints)
+        if min_z < 0.01:
+            base_pos[2] += -min_z + 0.01
+
 
         # ----------- The non-bass bodies ------------
 
@@ -351,10 +357,15 @@ class PyBulletWorld:
                 # finding the pivot locations
                 parent_com = np.array([parent_blueprint.x, parent_blueprint.y, parent_blueprint.z])
                 child_com = np.array([child_blueprint.x, child_blueprint.y, child_blueprint.z])
-                local_offset = child_com - parent_com
 
-                # defining the link oritentation and center of mass <--------TODO:
-                link_positions.append(local_offset.tolist())
+                # Use blueprint joint pivot (world coords) and convert to local offsets
+                pivot_world = np.array([joint.px, joint.py, joint.pz])
+                parent_local_pivot = pivot_world - parent_com
+                child_local_pivot = pivot_world - child_com
+
+                # defining the link orientation and center of mass
+                # Use the parent-local pivot as the link position so the joint aligns at the blueprint pivot
+                link_positions.append(parent_local_pivot.tolist())
                 link_orientations.append([0, 0, 0, 1])
                 link_inertial_positions.append([0.0, 0.0, 0.0])        
                 link_inertial_orientations.append([0.0, 0.0, 0.0, 1.0])
@@ -366,9 +377,19 @@ class PyBulletWorld:
                 else:
                     link_parent_indices.append(parent_link_idx + 1)
 
-                # setting up everything as a Revolute joint TODO: make sure this one freaking works now
-                link_joint_types.append(p.JOINT_REVOLUTE) 
+                # setting up everything as a Revolute joint
+                link_joint_types.append(p.JOINT_REVOLUTE)
+                # Axis specified in blueprint is in world coords; since we initialize with identity orientations, use it directly
                 link_joint_axes.append([joint.ax, joint.ay, joint.az])
+
+                # store the child-local pivot for potential constraint creation or diagnostics
+                if not hasattr(self, 'joint_local_frames'):
+                    self.joint_local_frames = {}
+                self.joint_local_frames[joint.id] = {
+                    'parent_pivot': parent_local_pivot.tolist(),
+                    'child_pivot': child_local_pivot.tolist(),
+                    'axis': [joint.ax, joint.ay, joint.az]
+                }
 
                 queue.append(child_id)
 
@@ -397,6 +418,30 @@ class PyBulletWorld:
             # client again
             physicsClientId = self.client
         )
+
+        # setting up joint limits on the created body (iterating over robot's list of joints)
+        for joint in self.joint_parts:
+            pybullet_idx = self.joint_indices_map[joint.id]
+            p.changeDynamics(
+                self.robot_id, 
+                pybullet_idx,
+                jointLowerLimit = float(joint.lower_limit),
+                jointUpperLimit = float(joint.upper_limit),
+                physicsClientId = self.client
+            )
+
+        # disabling default motors to allow full motor control YIPEE (this was to resolve an error where joints 
+        # could not be actuated and would just swing freely)
+        for i in range(p.getNumJoints(self.robot_id, physicsClientId=self.client)):
+            p.setJointMotorControl2(
+                self.robot_id, 
+                i,
+                controlMode = p.VELOCITY_CONTROL,
+                targetVelocity = 0, # initially stationary
+                force = 0,  # non-free-swinging
+                physicsClientId = self.client
+            )
+
         
         # surface properties for every sub-link
         for link_idx in range(-1, len(link_masses)):
@@ -406,6 +451,13 @@ class PyBulletWorld:
                 rollingFriction = ROLLING_FRICTION,
                 physicsClientId = self.client
             )
+        # for debugging (print mapping from blueprint joint id to pybullet joint index)
+        try:
+            for joint in self.joint_parts:
+                py_idx = self.joint_indices_map.get(joint.id, None)
+                print(f"DEBUG: joint blueprint id={joint.id} -> pybullet_index={py_idx}, blueprint_idx={getattr(joint, 'blueprint_idx', None)}, motor={getattr(joint, 'motor', False)}")
+        except Exception as e:
+            print("DEBUG: failed to print joint mappings:", e)
             
         return self.robot_id
     
@@ -490,15 +542,28 @@ class PyBulletWorld:
         """
         Apply motor command to joint
         """
+        # get the current joint angle
+        joint_state = p.getJointState(self.robot_id, joint_id, physicsClientId=self.client)
+        current_angle = joint_state[0]
+        
+        # compute the target velocity (same as Bullet's setMotorTarget internals)
+        angle_error = desired_angle - current_angle
+        target_velocity = angle_error / dt
+        
+        # apply velocity control with max impulse converted to force
+        # (force = impulse / dt)
+        max_force = MOTOR_MAX_FORCE # MOTOR_MAX_IMPULSE / dt 
+
         # moving the correct joint on the robot to the desired angle
         p.setJointMotorControl2(
-            bodyUniqueId = self.robot_id,
-            jointIndex = joint_id,
-            controlMode = p.POSITION_CONTROL,
-            targetPosition = desired_angle,
-            force = 200.0, # <----------------------------------------------
-            physicsClientId = self.client
+            bodyUniqueId=self.robot_id,
+            jointIndex=joint_id,
+            controlMode=p.VELOCITY_CONTROL,
+            targetVelocity=target_velocity,
+            force=max_force,
+            physicsClientId=self.client
         )
+
 
 
     def calculate_layer(self, weights, data_in): ###
@@ -614,24 +679,34 @@ class PyBulletWorld:
         self.output_s2j = self.calculate_layer(self.weights_s2j, self.sensor_touches)
         self.output_n2j = self.calculate_layer(self.weights_n2j, self.output_n2n)
         
-        # Actuate joints
+        # Actuate joints 
         for joint_idx, joint in enumerate(self.joint_parts):
-            if (joint.id in self.joint_indices_map):
+            if (joint.id in self.joint_indices_map) and getattr(joint, 'motor', False):
                 # 1. Fetch the correct PyBullet link/joint index
                 pybullet_joint_idx = self.joint_indices_map[joint.id]
-                
-                # 2. Calculate or override your motor commands
+
+                # 2. Find neural net index from blueprint ordering
+                nn_index = getattr(joint, 'blueprint_idx', None)
                 motor_command = 0.0
-                if joint_idx < len(self.output_n2j):
-                    motor_command = self.output_s2j[joint_idx] + self.output_n2j[joint_idx]
+                if nn_index is not None and nn_index < len(self.output_s2j) and nn_index < len(self.output_n2j):
+                    motor_command = self.output_s2j[nn_index] + self.output_n2j[nn_index]
                     motor_command = self.tanh(motor_command) * UNITS_TO_RADS
-                    print("motor = " + str(motor_command))
-                
-                # Test Wave Generator Override
-                if motor_command == 0.0:
+                else:
+                    # fallback small oscillation if ANN gives no command
                     motor_command = math.sin(self.time_step * 0.05) * (45 * (math.pi / 180))
-                
-                # 3. Pass the sequential PyBullet index instead of joint.id
+
+                # 3. Clamp to joint blueprint limits if present
+                try:
+                    low = float(joint.lower_limit)
+                    high = float(joint.upper_limit)
+                    motor_command = max(min(motor_command, high), low)
+                except Exception:
+                    pass
+
+                # Debug log
+                print(f"ACTUATE: joint.id={joint.id}, py_idx={pybullet_joint_idx}, nn_index={nn_index}, target={motor_command:.3f}")
+
+                # 4. Apply to pybullet joint
                 self.actuate_joint(pybullet_joint_idx, motor_command, self.dt)
                 '''
                 # find the neural net index
