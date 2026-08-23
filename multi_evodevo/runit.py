@@ -601,7 +601,7 @@ def main():
         if not os.path.isfile('../data/population_genes.db'):
             make_filled_db()
 
-        pop_num = 60#int(input("What population should be run? "))
+        pop_num = 50#int(input("What population should be run? "))
         gen_num = 100#int(input("How many generations should be run? "))
         #num_trials = int(input("How many independent trials (reps) per condition? "))
         databases_to_export = []  # Track databases for CSV export
@@ -668,9 +668,9 @@ def main():
 
         grav_val = -4#int(input(
             #"What was the gravity condition? "))
-        num = 4#int(input(
+        num = 0#int(input(
             #"Input the agent index (ex: 0 is the first agent). "))
-        total = 10#int(input(
+        total = 46#int(input(
             #"Input the total number of agents during that trial. "))
         fitness = run_generation_graphic(grav_val, somaline_genes, num, total)
         print("")

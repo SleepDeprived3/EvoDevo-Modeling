@@ -202,7 +202,6 @@ class JointPart(Part):
         and one value for each limit in radians (upper/lower)"""
         motor = (self.reg_active_passive[0] - self.reg_active_passive[1]) > 0
         free = (self.reg_free_rigid[0] - self.reg_free_rigid[1]) > 0
-        print("motor: " + str(motor) + ", free: " + str(free) + ", both: " + str(motor & free))
         try:
             upper_ratio = ((float(self.reg_upper_lower[0]) -
                            self.reg_upper_lower[1]) /
