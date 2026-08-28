@@ -70,7 +70,7 @@ def run_simulation(io_file, sim_num, test=False, grav=-9.81):
             str(sim_num), 
             str(grav), 
             headless=False, 
-            steps=1000
+            steps=3000#1000
         )
         
 

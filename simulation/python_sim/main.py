@@ -41,8 +41,10 @@ def load_blueprints_from_file(filename, file_type): ###
                 body = BodyPart(
                     id = int(parts[0]),
                     x = float(parts[1]),
-                    y = float(parts[2]),
-                    z = float(parts[3]),
+                    z = float(parts[2]),
+                    y = float(parts[3]),
+                    # y = float(parts[2]),
+                    # z = float(parts[3]),
                     size = float(parts[4])
                 )
                 body_count = body_count + 1
@@ -55,14 +57,21 @@ def load_blueprints_from_file(filename, file_type): ###
                     base_body = int(parts[1]),
                     other_body = int(parts[2]),
                     px = float(parts[3]),
-                    py = float(parts[4]),
-                    pz = float(parts[5]),
+                    pz = float(parts[4]),
+                    py = float(parts[5]),
+                    # py = float(parts[4]),
+                    # pz = float(parts[5]),
                     ax = float(parts[6]),
-                    ay = float(parts[7]),
-                    az = float(parts[8]),
+                    az = float(parts[7]),
+                    ay = float(parts[8]),
+                    # ay = float(parts[7]),
+                    # az = float(parts[8]),
                     lower_limit = float(parts[9]),
                     upper_limit = float(parts[10]),
-                    motor = (parts[11])
+                    # Legacy accepts a leading "T".  Be equally tolerant of
+                    # whitespace/casing so an active evolved joint is never
+                    # silently loaded as passive.
+                    motor = parts[11].strip().lower() in {"true", "t", "1"}
                 )
                 joint_count = joint_count + 1
                 results.append(joint)
@@ -73,8 +82,11 @@ def load_blueprints_from_file(filename, file_type): ###
                     id = int(parts[0]),
                     body_id = int(parts[1]),
                     x = float(parts[2]),
-                    y = float(parts[3]),
-                    z = float(parts[4])
+
+                    z = float(parts[3]),
+                    y = float(parts[4])
+                    # y = float(parts[3]),
+                    # z = float(parts[4])
                 )
                 sensor_count = sensor_count + 1
                 results.append(sensor)
@@ -170,6 +182,7 @@ def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000)
     # run simulation for all steps
     for step in range(max_steps + 1):
         if not headless:
+            print("STEP NUMBER: " + str(step))
             world.step(headless=False)
             time.sleep(world.dt)
         
