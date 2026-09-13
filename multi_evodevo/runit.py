@@ -589,7 +589,7 @@ def main():
     data_dir = '../data/'
     io_dir = '../io/'
 
-    thing_to_test = "3"#str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravi=[]ty\n2. Error Rate\n3. Test simulation with graphics (note: from an existing experiment))\n")).lower()
+    thing_to_test = "1"#str(input("What type of experiment do you want to run? (Select one of the following)\n1. Gravi=[]ty\n2. Error Rate\n3. Test simulation with graphics (note: from an existing experiment))\n")).lower()
 
     if thing_to_test == "1" or thing_to_test == "2":
         if not os.path.isdir(data_dir):
@@ -601,10 +601,10 @@ def main():
         if not os.path.isfile('../data/population_genes.db'):
             make_filled_db()
 
-        pop_num = 30#int(input("What population should be run? "))
-        gen_num = 80#int(input("How many generations should be run? "))
+        pop_num = 60#int(input("What population should be run? "))
+        gen_num = 100#int(input("How many generations should be run? "))
         #num_trials = int(input("How many independent trials (reps) per condition? "))
-        databases_to_export = []  # Track databases for CSV export
+        databases_to_export = []  # Track databases for CSV export;
     
 
     if thing_to_test == "1":
@@ -613,7 +613,7 @@ def main():
         build_er = 0.005#float(input(
             #"What build error condition? "))
         # Run 5 generations with incrementally increasing gravity
-        gravity_values = [-10]#[-4, -7, -10, -13, -16]
+        gravity_values = [-4, -7, -10, -13, -16]
         for grav_val in gravity_values:
             print("Gravity: ", grav_val)
             db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)

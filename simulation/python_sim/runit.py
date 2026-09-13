@@ -10,27 +10,31 @@ import os
 from pathlib import Path
 
 
-def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=1000):
+def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=1000, diagnostics_path=None):#diagnostics_path="diagnostics-10.csv"): 
     """
     Run the PyBullet physics simulation.
-    
+
     Args:
         io_file (str): Base configuration file path
         sim_number (int): Simulation number
         gravity (float): Gravity value
         headless (bool): Run in headless mode (yes or no)
         steps (int): Number of simulation steps
-    
+        diagnostics_path (str): If given, per-step/per-joint diagnostics CSV
+            path passed through to main.py's --diagnostics (see
+            PyBulletWorld._record_diagnostics). None by default -- normal
+            evolutionary runs should not pay for this.
+
     Returns:
         int: Exit code from the simulation
     """
     script_dir = Path(__file__).parent
     main_script = script_dir / "main.py"
-    
+
     if not main_script.exists():
         print(f"ERROR: {main_script} not found!")
         return 1
-    
+
     '''
     print("=" * 70)
     print("EvoDevo PyBullet Physics Simulation")
@@ -39,7 +43,7 @@ def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=1000
     print("=" * 70)
     print()
     '''
-    
+
     # Build command
     cmd = [sys.executable, str(main_script)]
     cmd.extend(["-f", str(io_file)])
@@ -48,9 +52,12 @@ def run_simulation_entry(io_file, sim_number, gravity, headless=True, steps=1000
     cmd.extend(["--steps", str(steps)])
 
     if headless:
-        cmd.append("--headless")        
+        cmd.append("--headless")
 
-    
+    if diagnostics_path:
+        cmd.extend(["--diagnostics", str(diagnostics_path)])
+
+
     # Run the simulation
     try:
         result = subprocess.run(cmd, cwd=str(script_dir))
@@ -110,15 +117,21 @@ def main():
         action="store_true",
         help="Run in headless mode (no graphics)"
     )
-    
+    parser.add_argument(
+        "--diagnostics",
+        default=None,
+        help="If given, write a per-step/per-joint diagnostics CSV to this path"
+    )
+
     args = parser.parse_args()
-    
+
     return run_simulation_entry(
         io_file=args.file,
         sim_number=args.number,
         gravity=args.gravity,
         headless=args.headless,
-        steps=args.steps
+        steps=args.steps,
+        diagnostics_path=args.diagnostics
     )
 
 

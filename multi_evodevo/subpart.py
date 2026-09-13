@@ -28,6 +28,9 @@ Wire_Characteristics = namedtuple('Wire_Characteristics',
                                   ['weight', 'to_joint'])
 
 
+MIN_MOUNT_ANGULAR_SEPARATION = math.pi / 36  # Minimum angular separation (45 degrees) between mounts
+
+
 class BodyPart(Part):
     def __init__(self, gene_sequence):
         Part.__init__(self, gene_sequence)
@@ -70,32 +73,28 @@ class BodyPart(Part):
             location = np.array([self.s_loc_holder[0],
                                  self.s_loc_holder[1],
                                  self.s_loc_holder[2]], dtype='f')
-            # if any(location):
-            #     location = location / np.linalg.norm(location)
-            #     self.s_mount_loc.append(location)
-            if any(location):
-                location = location / np.linalg.norm(location)
-                if any((location == i).all() or (location == j).all()
-                       for i, j in zip(self.s_mount_loc,
-                                                  self.j_mount_loc)):
-                    pass
-                else:
+            norm = np.linalg.norm(location)
+            if norm > 0:
+                location = location / norm
+                too_close = any(
+                    math.acos(np.clip(np.dot(location, existing), -1.0, 1.0)) < MIN_MOUNT_ANGULAR_SEPARATION
+                    for existing in self.s_mount_loc
+                )
+                if not too_close:
                     self.s_mount_loc.append(location)
         # Same for joints
         if ((self.j_mount_num - old_j_num) >= 1):
             location = np.array([self.j_loc_holder[0],
                                  self.j_loc_holder[1],
                                  self.j_loc_holder[2]], dtype='f')
-            # if any(location):
-            #     location = location / np.linalg.norm(location)
-            #     self.j_mount_loc.append(location)
-            if any(location):
-                location = location / np.linalg.norm(location)
-                if any((location == i).all() or (location == j).all()
-                       for i, j in zip(self.s_mount_loc,
-                                                  self.j_mount_loc)):
-                    pass
-                else:
+            norm = np.linalg.norm(location)
+            if norm > 0:
+                location = location / norm
+                too_close = any(
+                    math.acos(np.clip(np.dot(location, existing), -1.0, 1.0)) < MIN_MOUNT_ANGULAR_SEPARATION
+                    for existing in self.j_mount_loc
+                )
+                if not too_close:
                     self.j_mount_loc.append(location)
 
     def update(self):

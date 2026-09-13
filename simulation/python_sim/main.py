@@ -12,7 +12,13 @@ import os
 import time
 import pybullet as p
 
-from physics_engine_MULTI import PyBulletWorld, BodyPart, JointPart, SensorPart
+from physics_engine_MULTI import (
+    PyBulletWorld,
+    BodyPart,
+    JointPart,
+    SensorPart,
+    InvalidBodyPlanError,
+)
 
 
 
@@ -140,23 +146,23 @@ def build_blueprint_filenames(io_file, sim_number):
 
 
 
-def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000):
+def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000, diagnostics_path=None):
     """Run the PyBullet physics simulation"""
-    
+
     # load blueprints / bodies / weights
     files = build_blueprint_filenames(io_file, sim_number)
-    
+
     bodies = load_blueprints_from_file(files['body'], 'body')
     joints = load_blueprints_from_file(files['joint'], 'joint')
     sensors = load_blueprints_from_file(files['sensor'], 'sensor')
-    
+
     weights_s2n = load_matrix_from_file(files['s2n'])
     weights_n2n = load_matrix_from_file(files['n2n'])
     weights_s2j = load_matrix_from_file(files['s2j'])
     weights_n2j = load_matrix_from_file(files['n2j'])
-    
+
     # Initialize world (either in graphics or headless mode)
-    world = PyBulletWorld(gravity=gravity, headless=headless)
+    world = PyBulletWorld(gravity=gravity, headless=headless, diagnostics_path=diagnostics_path)
 
     world.weights_s2n = weights_s2n
     world.weights_n2n = weights_n2n
@@ -167,7 +173,23 @@ def run_simulation(io_file, sim_number, gravity, headless=False, max_steps=1000)
 
     # Create bodies and joints
     #print("Creating physics objects...")
-    world.create_robot(bodies, joints, sensors)
+    try:
+        robot_id = world.create_robot(bodies, joints, sensors)
+    except InvalidBodyPlanError as error:
+        # Invalid morphology is a failed evolutionary trial, not a runner
+        # failure.  Always write fitness output so the parent process does
+        # not wait for a file that will never arrive.
+        print(error)
+        output_file = os.path.join(os.path.abspath(io_file), f'sim_{sim_number}.dat')
+        world.save_position(output_file, completed=False)
+        world.disconnect()
+        return 0
+
+    if robot_id is None:
+        output_file = os.path.join(os.path.abspath(io_file), f'sim_{sim_number}.dat')
+        world.save_position(output_file, completed=False)
+        world.disconnect()
+        return 0
     
     '''
     # creating sensors
@@ -234,7 +256,17 @@ def main():
         default=1000,
         help="Number of simulation steps"
     )
-    
+    parser.add_argument(
+        "--diagnostics",
+        default=None,
+        help=(
+            "If given, write a per-step/per-joint diagnostics CSV to this "
+            "path (commanded torque, joint-limit state, parent-link "
+            "self-contact penetration, base speed) -- see "
+            "PyBulletWorld._record_diagnostics for column meanings."
+        )
+    )
+
     args = parser.parse_args()
 
     return run_simulation(
@@ -242,7 +274,8 @@ def main():
         sim_number=args.number,
         gravity=args.gravity,
         headless=args.headless,
-        max_steps=args.steps
+        max_steps=args.steps,
+        diagnostics_path=args.diagnostics
     )
 
 
