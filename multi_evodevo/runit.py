@@ -602,7 +602,7 @@ def main():
             make_filled_db()
 
         pop_num = 60#int(input("What population should be run? "))
-        gen_num = 100#int(input("How many generations should be run? "))
+        gen_num = 300#int(input("How many generations should be run? "))
         #num_trials = int(input("How many independent trials (reps) per condition? "))
         databases_to_export = []  # Track databases for CSV export;
     
@@ -613,7 +613,7 @@ def main():
         build_er = 0.005#float(input(
             #"What build error condition? "))
         # Run 5 generations with incrementally increasing gravity
-        gravity_values = [-4, -7, -10, -13, -16]
+        gravity_values = [-10]#[-4, -7, -10, -13, -16]
         for grav_val in gravity_values:
             print("Gravity: ", grav_val)
             db_file = run_generations(rep_er, build_er, pop_num, grav=grav_val, generations=gen_num)

@@ -39,41 +39,40 @@ BASE_TORQUE_CONSTANT = MOTOR_MAX_IMPULSE / DT
 MAX_MOTOR_SPEED = 6.0
 JOINT_DAMPING = 0.5
 
-# See create_robot's changeDynamics call and _biological_torque_cap below.
-# PyBullet's jointLowerLimit/jointUpperLimit (set via changeDynamics) only
-# have holding force if jointLimitForce is ALSO set -- confirmed directly
-# against this sim's pybullet build (bulletphysics/bullet3#2919 added
-# jointLimitForce as a separate, required parameter; without it, a joint
-# configured with e.g. a +/-0.05 rad limit was driven straight through to a
-# 1.2 rad target under both POSITION_CONTROL and a large TORQUE_CONTROL
-# force, with zero resistance from the "limit"). This was true of the
-# ORIGINAL code too (create_robot's changeDynamics call never set
-# jointLimitForce) -- an independent, pre-existing gap, not something the
-# 2026-09-13 POSITION_CONTROL change introduced. See
-# claude/pybullet-architecture-review.md for the verification.
-JOINT_LIMIT_FORCE_STIFFNESS = 20.0
+# bounded PD controller gains (dimensionless relative to the joint torque cap)
+# De-saturation of Mechanism 3 ("the PD controller is a disguised bang-bang
+# controller", joint-explosion-investigation.md): with KP=2.0, normalized
+# torque already exceeded 1 (i.e. the controller was saturated to
+# +/-torque_cap, not doing proportional control at all) for any angle_error
+# past ~0.5 rad (28.6 deg) -- and an untrained/early-generation ANN has no
+# reason to output small errors. Halving KP roughly doubles the error range
+# over which the controller is genuinely proportional (now ~1.0 rad / 57.3
+# deg) before saturating.
+PD_KP = 1.0
+PD_KD = 0.5
 
-# ---------------------------------------------------------------------------
-# Actuator control mode (2026-09-13, architecture review): actuate_joint now
-# drives every motorized joint with PyBullet's native POSITION_CONTROL
-# (implemented internally as a constraint, solved implicitly in the same
-# linear system as contacts and joint limits) instead of a hand-rolled PD
-# computed in Python and applied via TORQUE_CONTROL (an explicit external
-# force, decoupled from that same-step solve). See
-# claude/pybullet-architecture-review.md for the full rationale, and
-# claude/joint-explosion-investigation.md for Mechanisms 3/5/6, which were
-# all specific consequences of the old explicit-force approach (bang-bang
-# saturation, torque/inertia mismatches, and the light-parent "floating"
-# bug) and needed their own hand-built safety nets (a slew-rate limiter, an
-# inertia-safety multiplier) that are no longer required with an implicit
-# controller. POSITION_GAIN/VELOCITY_GAIN are PyBullet's own
-# positionGain/velocityGain terms (not numerically interchangeable with the
-# old dimensionless PD_KP/PD_KD -- PyBullet's internal error formula
-# differs), calibrated empirically against the same regression cases the
-# old controller was tuned against (see test scripts referenced in the
-# architecture review doc).
-POSITION_GAIN = 0.7 # <------------------------------------------------------------------------------- was 0.2 initially
-VELOCITY_GAIN = 1.0
+# Halving PD_KP alone doesn't stop a single saturated step from being a
+# shock -- a genome that *does* command a large angle_error still jumps
+# straight to torque_cap on the very first step. This directly bounds that:
+# the fraction of a joint's own torque_cap that the commanded torque is
+# allowed to change by in one physics step (see the slew-rate limiter in
+# actuate_joint). 0.2 means a full 0 -> torque_cap ramp takes ~5 steps
+# (~83ms at 60Hz) instead of one instantaneous jump into the rigid
+# multibody joint -- comparable to biological muscle activation timescales
+# (fast-twitch fibers reach peak force in roughly 30-100ms), and still fast
+# enough to feel responsive. Expressed as a fraction of torque_cap (not an
+# absolute torque) so it scales correctly with body/joint size.
+TORQUE_SLEW_FRACTION_PER_STEP = 0.2
+
+# NOTE (2026-09-13, "floating" investigation): a couple of variants of
+# "let the PD's damping term react faster than the slew limit allows" were
+# tried here -- an additive extra damping term, then an asymmetric slew
+# rule that exempted a shrinking/reversing torque -- both intended to fix
+# residual small-joint oscillation. Both were tested against the existing
+# mismatched-size/narrow-range regression case and found to let that joint
+# overshoot its own configured range, which the plain symmetric slew below
+# does not. Reverted; see actuate_joint for what actually shipped. Left as
+# a candidate for future, more carefully validated tuning.
 
 # Mechanism 6 ("floating" persists after the inverted-limit repair; see
 # joint-explosion-investigation.md, 2026-09-13 continued): torque_cap_for_joint's
@@ -112,73 +111,18 @@ VELOCITY_GAIN = 1.0
 # spheres, ~96%. That was an artifact of the absolute target, not a real
 # fix requirement -- a joint with no size mismatch should be unaffected by
 # Mechanism 6 regardless of how small both bodies happen to be. See
-# the corrected, scale-invariant (ratio-based, not absolute-target-based)
-# replacement that shipped as `_inertia_safety_multiplier`: dimensionless,
-# left a matched pair's torque_cap completely untouched regardless of
-# absolute size, and only reduced torque_cap as the parent became lighter
-# relative to the child. That multiplier was itself later REMOVED (see
-# torque_cap_for_joint's docstring below) once actuate_joint switched to
-# native POSITION_CONTROL and testing showed it was no longer needed.
+# `_inertia_safety_multiplier` below for the corrected, scale-invariant
+# (ratio-based, not absolute-target-based) replacement: dimensionless,
+# leaves a matched pair's torque_cap completely untouched regardless of
+# absolute size, and only reduces torque_cap as the parent becomes lighter
+# relative to the child.
 
 
 # motor reference
 REFERENCE_SIZE = 1.0
 REFERENCE_MOMENT_ARM = REFERENCE_SIZE
-
-# NOTE (2026-09-14, toppling-dominance investigation, continued): the
-# un-scaled line below ("meant to replicate the 0.4 from the legacy code")
-# calibrated REFERENCE_MUSCLE_FORCE by reverse-matching legacy's fixed,
-# size-INDEPENDENT motor-impulse budget (MOTOR_MAX_IMPULSE=0.4 -> 24 N*m for
-# every joint regardless of body size) at one arbitrary reference size. That
-# match is cosmetic, not physical: legacy's motor law and this sim's size^3
-# biological law are different SHAPES of function (flat vs. cubic in size),
-# so agreeing at a single point says nothing about whether either law
-# actually supplies enough torque to do real mechanical work -- specifically,
-# to hold or lift a limb against gravity, which is exactly what a
-# ground-pushing/leg-lifting gait requires and what a passive topple never
-# needs. Checked directly: a limb's own gravitational torque about its
-# hinge (mass * g * moment_arm) scales as size^4 (mass ~ size^3, arm ~ size),
-# one power of size steeper than the size^3 muscle-torque law -- so whatever
-# ratio of available-to-required torque exists at one size gets WORSE for
-# every larger size and BETTER for every smaller one, regardless of the
-# absolute calibration chosen. With the un-scaled constant, that ratio at
-# REFERENCE_SIZE=1.0 (the genome's own default/floor-adjacent size -- see
-# multi_evodevo/subpart.py's size formula, clamped to [0.5, 10]) works out to
-# roughly 0.29: a reference-size joint has under a third of the torque
-# needed to even hold a same-size limb level against this sim's -10 gravity
-# baseline, let alone actively lift one there from a hanging start. Verified
-# empirically, not just algebraically: a synthetic reference-size joint
-# commanded to hold ANY target requiring genuine lift against -10 gravity
-# never converges under the un-scaled constant -- it saturates at max torque
-# and perpetually oscillates instead of settling, at every tested size from
-# 0.5 to 5.0 -- while a joint free to move in a gravity-NEUTRAL plane (a yaw
-# swing about a vertical axis, which is what every case in
-# regression_tests_actuation.py happens to test) converges fine, which is
-# why this gap was never caught by that suite despite it already running at
-# gravity=-10.0.
-#
-# MUSCLE_STRENGTH_SCALE recalibrates the absolute constant independently of
-# legacy's unrelated fixed-impulse number, using a straightforward
-# biomechanical criterion instead: a joint should be able to comfortably
-# hold or lift a same-size limb through its full usable range against this
-# sim's own gravity baseline, not just break even. 8.0 is the smallest
-# round-number scale that empirically gives a fully-converging margin
-# (tested against the worst-case fully-horizontal hold, the hardest case
-# geometry produces) through about 2x REFERENCE_SIZE, while still leaving
-# much larger bodies (roughly >2.3x REFERENCE_SIZE, where the ratio falls
-# back below 1 -- 8x moves the break-even point from size 0.29 to size
-# ~2.33) progressively torque-limited against gravity. That upper cutoff is
-# deliberately kept, not engineered away: real animals show exactly this
-# square-cube pattern (small/mid-sized creatures can hold and swing their
-# limbs; very large ones increasingly can't), and it gives a biologically
-# motivated reason for the largest evolved bodies to still favor toppling
-# over articulation, rather than making every size unconditionally capable.
-# JOINT_LIMIT_FORCE_STIFFNESS's 20x relationship to the active torque cap
-# (see create_robot) is unaffected -- it is expressed as a multiple of
-# _biological_torque_cap, so the passive limit-stop strength scales up
-# automatically along with the active cap.
-MUSCLE_STRENGTH_SCALE = 8.0
-REFERENCE_MUSCLE_FORCE = MUSCLE_STRENGTH_SCALE * BASE_TORQUE_CONSTANT / REFERENCE_MOMENT_ARM
+# (meant to replicate the 0.4 from the legacy code)
+REFERENCE_MUSCLE_FORCE = BASE_TORQUE_CONSTANT / REFERENCE_MOMENT_ARM
 
 # spawn overlap handling
 BODY_OVERLAP_TOLERANCE = 1e-4
@@ -275,12 +219,14 @@ class JointPart: ###
 
         # Pivot-to-child-COM distance ("r_off" in _resolve_body_placements_
         # and_prune / _max_safe_swing_angle), recorded alongside the other
-        # clamp_diag_* breadcrumbs above. Originally used by
-        # torque_cap_for_joint's Mechanism-6 reduced-inertia safety
-        # multiplier (since removed -- see torque_cap_for_joint's docstring
-        # -- as unnecessary once actuate_joint switched to native
-        # POSITION_CONTROL); kept as a diagnostic breadcrumb in case a
-        # similar per-joint pivot-inertia computation is useful again.
+        # clamp_diag_* breadcrumbs above. Used by torque_cap_for_joint's
+        # Mechanism-6 reduced-inertia safety multiplier (see
+        # _inertia_safety_multiplier) to get the child's actual pivot
+        # inertia via the parallel axis theorem, rather than approximating
+        # it as touching-contact distance (child_radius). None for a joint
+        # that never reached that computation (e.g. a hand-built test robot
+        # that skips _resolve_body_placements_and_prune) -- callers fall
+        # back to child_radius in that case.
         self.clamp_diag_child_pivot_offset = None
 
 class SensorPart: ###
@@ -300,21 +246,19 @@ class InvalidBodyPlanError(ValueError):
     """Raised when an evolved blueprint begins with intersecting spheres."""
 
 
-def _biological_torque_cap(size):
-    """Plain size^3 biological muscle-force law (muscle force ~ size^2 via
-    cross-sectional area, moment arm ~ size). This is torque_cap_for_joint's
-    entire ACTIVE motor torque cap (no further safety adjustment -- see that
-    function's docstring for the now-removed Mechanism-6 multiplier this
-    once fed into), and is also reused to size the joint's PASSIVE
-    limit-stop strength (see JOINT_LIMIT_FORCE_STIFFNESS / create_robot's
-    changeDynamics call) -- a ligament/bone-on-bone ROM stop is a passive,
-    structural property of the limb, sized off the same underlying law
-    rather than an unrelated constant.
+def _sphere_pivot_inertia(mass, radius, pivot_offset):
+    """Rotational inertia of a solid sphere about an axis through a pivot
+    point offset from the sphere's own center by `pivot_offset` (parallel
+    axis theorem: I = I_cm + m*d^2). Uses the same COLLISION_RADIUS_SCALE-
+    shrunk radius PyBullet actually builds the collision sphere from (and
+    therefore what it computes automatic mass/inertia from in createMultiBody),
+    so this matches the engine's own numbers rather than the nominal
+    (visual) blueprint size -- see torque_cap_for_joint / Mechanism 6 in
+    joint-explosion-investigation.md.
     """
-    scale = size / REFERENCE_SIZE
-    muscle_force = REFERENCE_MUSCLE_FORCE * (scale ** 2)
-    moment_arm = REFERENCE_MOMENT_ARM * scale
-    return muscle_force * moment_arm
+    collision_radius = COLLISION_RADIUS_SCALE * radius
+    i_cm = 0.4 * mass * (collision_radius ** 2)
+    return i_cm + mass * (pivot_offset ** 2)
 
 
 def _clamp_range_to_safe_swing(lower, upper, theta_max):
@@ -555,6 +499,15 @@ class PyBulletWorld:
         self.last_target_velocities = {}
         self.last_torque_caps = {}
         self.last_joint_states = {}
+        # Previous step's post-slew-limit applied torque per joint, used by
+        # actuate_joint's slew-rate limiter (Mechanism 3 de-saturation).
+        # Deliberately a separate dict from last_motor_commands: that one
+        # gets overwritten with the raw desired *angle* (not torque) by
+        # step() immediately before actuate_joint runs each frame, so it
+        # cannot be trusted to hold "last step's torque" at the point
+        # actuate_joint needs it.
+        self._prev_applied_torque = {}
+
         self.robot_id = None
 
         # link_parent_index[i] = pybullet link index of link i's parent, or
@@ -572,7 +525,7 @@ class PyBulletWorld:
             self._diag_writer.writerow([
                 "step", "joint_id", "pybullet_idx",
                 "position_rad", "velocity_rad_s", "applied_torque",
-                "target_angle_rad", "torque_cap", "torque_saturated",
+                "commanded_torque", "torque_cap", "torque_saturated",
                 "lower_limit", "upper_limit", "at_lower_limit", "at_upper_limit",
                 "genome_limits_were_inverted",
                 "parent_contact_penetration_m", "max_self_contact_penetration_m",
@@ -1135,38 +1088,6 @@ class PyBulletWorld:
             physicsClientId = self.client
         )
 
-        # NOTE (2026-09-14, "joints move for ~1s then freeze" investigation):
-        # legacy's CreateSphere calls
-        # m_bodyparts[index]->setActivationState(DISABLE_DEACTIVATION) on
-        # EVERY body part at creation (NoiseWorld.h) -- bodies there never
-        # enter Bullet's automatic sleep state, for the whole simulation.
-        # This sim never carried that over: PyBullet's own default
-        # sleep/deactivation behavior (a body -- or here, a whole multibody
-        # island -- below a velocity threshold for a couple of seconds stops
-        # integrating forces, including gravity AND motor torque, until
-        # something wakes it) has been silently in effect the entire time.
-        # Direct synthetic testing did not reproduce a sleep-induced freeze
-        # for a single driven joint (motion continued correctly for 10+
-        # simulated seconds either way, with or without this), so it is not
-        # confirmed to be the cause of the specific "stops after ~1s"
-        # symptom -- the leading explanation for that is architectural (see
-        # the project doc: the ANN is a stateless, per-step function of only
-        # the current binary contact sensors, so once a body's contact
-        # pattern stops changing, its output -- and every joint's commanded
-        # target -- is mathematically frozen, with nothing to unstick it).
-        # But this is a real, unambiguous, zero-risk gap from legacy
-        # regardless of whether it's contributing here, and a larger/more
-        # complex real evolved body (many links, many self-collisions) is a
-        # very different regime from the two-body synthetic tests this was
-        # checked against -- so it's fixed defensively rather than left as an
-        # open, untested difference from legacy.
-        for _link_index in range(-1, p.getNumJoints(self.robot_id, physicsClientId=self.client)):
-            p.changeDynamics(
-                self.robot_id, _link_index,
-                activationState=p.ACTIVATION_STATE_DISABLE_SLEEPING,
-                physicsClientId=self.client
-            )
-
         # record parent-link mapping for diagnostics (see _record_diagnostics):
         # link_parent_indices uses createMultiBody's convention (0 = base is
         # parent, k = link k-1 is parent); convert to plain pybullet link
@@ -1201,33 +1122,11 @@ class PyBulletWorld:
         # of how any individual torque_cap/inertia pairing works out.
         for joint in self.joint_parts:
             pybullet_idx = self.joint_indices_map[joint.id]
-            child_size = self.bodies_by_id[joint.other_body].size
-            limit_force = JOINT_LIMIT_FORCE_STIFFNESS * _biological_torque_cap(child_size)
-            # NOTE: jointLowerLimit/jointUpperLimit/jointLimitForce and
-            # maxJointVelocity MUST be set in separate changeDynamics calls.
-            # Confirmed directly against this sim's pybullet build: setting
-            # maxJointVelocity in the SAME changeDynamics call as
-            # jointLimitForce silently disables the joint-limit constraint
-            # entirely (a joint configured with e.g. a +/-0.2 rad limit and
-            # jointLimitForce=100 sails straight through to an unrelated 2.0
-            # rad target under a 1000 N push when the two are combined in
-            # one call; splitting into two calls with otherwise identical
-            # arguments holds it at exactly 0.2 as expected). This is a
-            # separate, independent gotcha from jointLimitForce itself being
-            # required at all (see JOINT_LIMIT_FORCE_STIFFNESS above) -- both
-            # were needed to get a real, holding joint limit. See
-            # claude/pybullet-architecture-review.md for the reproduction.
             p.changeDynamics(
                 self.robot_id,
                 pybullet_idx,
                 jointLowerLimit=float(joint.lower_limit),
                 jointUpperLimit=float(joint.upper_limit),
-                jointLimitForce=limit_force,
-                physicsClientId=self.client
-            )
-            p.changeDynamics(
-                self.robot_id,
-                pybullet_idx,
                 maxJointVelocity=MAX_MOTOR_SPEED,
                 physicsClientId=self.client
             )
@@ -1407,79 +1306,180 @@ class PyBulletWorld:
         a second, independent backstop against any other torque/inertia
         mismatch this doesn't anticipate.
 
-        Mechanism 6 (see joint-explosion-investigation.md, 2026-09-13
-        continued) found a gap when the *parent* is the lighter side of the
-        joint -- a large child gets a large biological cap regardless of how
-        little inertia its (tiny) parent has to resist the reaction torque
-        with -- and fixed it with an inertia-safety multiplier on top of this
-        cap. That multiplier was REMOVED in the 2026-09-13 architecture
-        review after switching actuate_joint from an explicit TORQUE_CONTROL
-        PD to PyBullet's native, implicit POSITION_CONTROL (see
-        claude/pybullet-architecture-review.md): re-testing the exact
-        Mechanism-6 reproduction (parent radius 0.5, child radius 6.4) with
-        this plain biological cap and NO multiplier, under POSITION_CONTROL,
-        showed clean convergence to a held target with zero drift over a
-        1000-step run -- the multiplier existed only to protect the old
-        explicit-force controller from overshooting, and an implicit
-        position constraint (solved with both bodies' actual inertia already
-        in the same step) doesn't have that failure mode.
+        Mechanism 6, v2 (see joint-explosion-investigation.md, 2026-09-13
+        continued -- this replaces a first version of Mechanism 6 that was
+        shipped, then found to over-penalize ordinary small-but-matched
+        joints and reverted/corrected in the same investigation): scaling
+        off the child alone still leaves a gap when the *parent* is the
+        lighter side of the joint -- a large child gets a large biological
+        cap regardless of how little inertia its (tiny) parent has to
+        resist the reaction torque with. `_inertia_safety_multiplier` below
+        catches that case with a dimensionless, scale-invariant multiplier
+        in (0, 1]: 1.0 (no change at all) whenever the parent is at least
+        as heavy as the child -- exactly the case this biological law was
+        already designed around -- falling toward 0 only as the parent
+        becomes much lighter than the child. Multiplying (not taking an
+        independent min() against an absolute, size-blind velocity/step
+        target, which is what the reverted first version did) is what keeps
+        this scale-invariant: a matched pair gets no penalty regardless of
+        whether it's a matched *small* pair or a matched *large* pair.
         """
         child_size = self.bodies_by_id[joint.other_body].size
-        return _biological_torque_cap(child_size)
+        joint_size = child_size
+
+        scale = joint_size / REFERENCE_SIZE
+        muscle_force = REFERENCE_MUSCLE_FORCE * (scale ** 2)
+        moment_arm = REFERENCE_MOMENT_ARM * scale
+
+        biological_cap = muscle_force * moment_arm
+
+        return biological_cap * self._inertia_safety_multiplier(joint)
+
+    def _inertia_safety_multiplier(self, joint):
+        """Mechanism 6 safety multiplier on torque_cap_for_joint's
+        biological cap (see that function's docstring).
+
+        Estimates the joint's actual two-body reduced rotational inertia
+        about its own pivot (parent and child each treated as an isolated
+        sphere, via the parallel axis theorem -- an approximation for a
+        multi-link chain, but it captures the dominant effect: the
+        immediate neighboring body's mass, confirmed empirically to match
+        PyBullet's own reported single-step angular response to within
+        numerical precision for an isolated two-body joint), and combines
+        them the way a classic two-body problem combines reduced mass
+        (1/I_reduced = 1/I_parent + 1/I_child, so the lighter side
+        dominates).
+
+        `torque_cap_for_joint`'s biological law already scales off the
+        CHILD alone, implicitly assuming the child rotates against an
+        effectively infinite/heavy anchor (I_parent >> I_child) -- true
+        whenever the parent is the same size or bigger, per Mechanism 5.
+        This returns `min(1, 2*I_reduced/I_child)`: exactly 1.0 whenever
+        I_parent >= I_child (I_reduced/I_child >= 0.5, so the "min" clamp is
+        what actually binds -- no change from the biological law at all,
+        regardless of absolute size -- verified against a sweep of matched
+        parent/child pairs from radius 0.05 to 20.0: every single one comes
+        back with a multiplier of exactly 1.0, unlike the reverted first
+        version of this mechanism, which crushed small matched pairs by
+        over 90% purely as a side effect of comparing against an absolute
+        velocity target instead of this pair's own child-alone baseline),
+        and falls smoothly toward 0 as the parent becomes much lighter than
+        the child (I_reduced -> I_parent as I_parent -> 0, so the
+        multiplier -> 2*I_parent/I_child -> 0) -- exactly the "floating"
+        case Mechanism 6 exists to catch. Because this is a ratio against
+        the child's own inertia rather than a fixed step/velocity target,
+        it stays scale-invariant: worked through algebraically, a joint
+        driven at this multiplier-reduced cap produces a single-step
+        angular velocity change of at most `2 * biological_cap * dt /
+        I_child` regardless of how light the parent is (the parent-mass
+        dependence cancels out of the algebra once the multiplier is
+        applied) -- and since `biological_cap` and `I_child` are both
+        derived from the same child body, this bound inherits the same
+        size scaling the biological law already relies on elsewhere in
+        this file (see Mechanism 5's own aside on `size^-2` divergence for
+        very small children -- a pre-existing, already-accepted residual
+        risk this multiplier does not change, since it multiplies to
+        exactly 1.0 whenever the child is the lighter side, same as before
+        Mechanism 6 existed).
+
+        Returns 1.0 (no adjustment) if the joint's bodies aren't resolvable
+        (should not happen for any joint that went through create_robot).
+        """
+        parent_body = self.bodies_by_id.get(joint.base_body)
+        child_body = self.bodies_by_id.get(joint.other_body)
+        if parent_body is None or child_body is None:
+            return 1.0
+
+        parent_radius = parent_body.size
+        child_radius = child_body.size
+        if parent_radius <= 0.0 or child_radius <= 0.0:
+            return 1.0
+
+        # Pivot-to-COM offset: exact for the parent (_resolve_body_placements_
+        # and_prune places the pivot at `parent_center + mount_dir*parent_radius`,
+        # i.e. exactly parent_radius from the parent's own center); recorded
+        # as a breadcrumb for the child (falls back to the child's own
+        # radius -- the typical touching-contact placement -- for a joint
+        # built outside that pipeline, e.g. a hand-built test robot).
+        parent_pivot_offset = parent_radius
+        child_pivot_offset = getattr(joint, 'clamp_diag_child_pivot_offset', None)
+        if child_pivot_offset is None:
+            child_pivot_offset = child_radius
+
+        parent_mass = (4.0 / 3.0) * math.pi * (parent_radius ** 3) * DENSITY
+        child_mass = (4.0 / 3.0) * math.pi * (child_radius ** 3) * DENSITY
+
+        parent_inertia = _sphere_pivot_inertia(parent_mass, parent_radius, parent_pivot_offset)
+        child_inertia = _sphere_pivot_inertia(child_mass, child_radius, child_pivot_offset)
+        if parent_inertia <= 0.0 or child_inertia <= 0.0:
+            return 1.0
+
+        reduced_inertia = (parent_inertia * child_inertia) / (parent_inertia + child_inertia)
+
+        return min(1.0, 2.0 * reduced_inertia / child_inertia)
+
 
     def actuate_joint(self, joint_id, desired_angle, dt, torque_cap=BASE_TORQUE_CONSTANT): ###
         """
-        Drive a joint toward `desired_angle` using PyBullet's native, implicit
-        POSITION_CONTROL constraint (2026-09-13 architecture review; replaces
-        a hand-rolled TORQUE_CONTROL PD -- see the POSITION_GAIN/VELOCITY_GAIN
-        comment near the top of this file and
-        claude/pybullet-architecture-review.md for the full rationale).
+        Apply a bounded PD torque controller to a joint.
 
-        Short version: PyBullet's own Quickstart Guide states that
-        POSITION_CONTROL/VELOCITY_CONTROL are implemented "as a constraint" --
-        solved implicitly, in the same linear system as every contact and
-        joint limit this same step -- while TORQUE_CONTROL is implemented "as
-        an external force," decoupled from that solve. A hand-written PD
-        computed in Python and applied via TORQUE_CONTROL has no way to know
-        it is about to overshoot into a rigid stop or a much-lighter
-        neighboring body; that blind spot was the root cause of Mechanisms 3,
-        5, and 6 in joint-explosion-investigation.md (bang-bang saturation,
-        torque/inertia mismatches, and the light-parent "floating" bug), each
-        of which needed its own hand-built safety net (a slew-rate limiter,
-        an inertia-safety multiplier) to work around. POSITION_CONTROL is
-        solved with both bodies' actual inertia already in the same step, so
-        it cannot overshoot the same way -- removing the need for those
-        safety nets rather than adding another one.
-
-        `desired_angle` is exactly the same ANN-derived, range-clamped target
-        step() already computes; nothing upstream of this function changes.
-        `torque_cap` (from torque_cap_for_joint's biological size^3 law)
-        becomes the motor's maximum force, and MAX_MOTOR_SPEED remains the
-        hard joint-velocity backstop -- both unchanged from before.
+        The neural network supplies a desired joint angle.  The PD controller
+        converts position and velocity error into a torque, which is then
+        bounded by the biologically scaled maximum joint torque.
         """
+        # Get the current joint angle and angular velocity.
+        joint_state = p.getJointState(
+            self.robot_id, joint_id, physicsClientId=self.client
+        )
+        current_angle, current_velocity = joint_state[0], joint_state[1]
+
+        # Compute the shortest angular error in (-pi, pi).
+        angle_error = desired_angle - current_angle
+        angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))
+
+        # Bounded PD torque.  Gains are expressed relative to the joint's
+        # maximum torque so that changing body size changes actuator capacity
+        # without changing the controller's dimensionless behavior.
+        normalized_torque = (PD_KP * angle_error) - (PD_KD * current_velocity)
+        torque = torque_cap * normalized_torque
+        torque = max(-torque_cap, min(torque_cap, torque))
+
+        # Slew-rate limit (Mechanism 3 de-saturation, see
+        # joint-explosion-investigation.md): bound how far the *applied*
+        # torque is allowed to move from what was actually applied last
+        # step, regardless of what the raw PD law above computes. This is
+        # what stops a full 0 -> torque_cap jump from landing on the rigid
+        # multibody joint in a single 1/60s step -- lowering PD_KP alone
+        # only makes saturation less frequent, it doesn't bound the size of
+        # a saturated step once one occurs.
+        #
+        # An asymmetric version of this (exempting a shrinking/reversing
+        # torque from slewing, so the controller's damping could react
+        # faster once a joint was already oscillating) was tried during the
+        # 2026-09-13 "floating" investigation and reverted: it let a
+        # severely size-mismatched joint with a tightly clamped range
+        # overshoot its own configured limit, where this symmetric version
+        # (verified in that same investigation) does not. Left as a
+        # candidate for future, more careful tuning rather than shipped.
+        prev_torque = self._prev_applied_torque.get(joint_id, 0.0)
+        max_step_change = TORQUE_SLEW_FRACTION_PER_STEP * torque_cap
+        torque = max(prev_torque - max_step_change, min(prev_torque + max_step_change, torque))
+        self._prev_applied_torque[joint_id] = torque
+
+        # Save requested target/control values for post-step diagnostics.
+        self.last_motor_targets[joint_id] = desired_angle
+        self.last_target_velocities[joint_id] = None
+        self.last_torque_caps[joint_id] = torque_cap
+        self.last_motor_commands[joint_id] = torque
+
+        # Apply the bounded torque directly.
         p.setJointMotorControl2(
             bodyUniqueId=self.robot_id,
             jointIndex=joint_id,
-            controlMode=p.POSITION_CONTROL,
-            targetPosition=desired_angle,
-            targetVelocity=0.0,
-            positionGain=POSITION_GAIN,
-            velocityGain=VELOCITY_GAIN,
-            force=torque_cap,
-            maxVelocity=MAX_MOTOR_SPEED,
+            controlMode=p.TORQUE_CONTROL,
+            force=torque,
             physicsClientId=self.client
         )
-
-        # Save requested target/control values for post-step diagnostics.
-        # There is no separate "commanded torque" under this control mode --
-        # the constraint solver decides the actual torque jointly with
-        # contacts/limits this same step; _record_diagnostics reads the
-        # *applied* torque back from p.getJointState instead (same as
-        # before), and last_motor_commands now holds the target angle.
-        self.last_motor_targets[joint_id] = desired_angle
-        self.last_target_velocities[joint_id] = 0.0
-        self.last_torque_caps[joint_id] = torque_cap
-        self.last_motor_commands[joint_id] = desired_angle
 
 
     def _zero_vector_for_matrix(self, weights, fallback_length=0):
@@ -1726,12 +1726,9 @@ class PyBulletWorld:
         genome, which failure mode is actually firing at the moment things
         blow up:
 
-          - torque_saturated: the *applied* torque (read back from PyBullet
-            after the step; see actuate_joint / torque_cap_for_joint) is
-            at/near the motor's force limit. Under POSITION_CONTROL (see the
-            2026-09-13 architecture-review note above actuate_joint) this
-            reflects the constraint solver's own decision, not a
-            Python-computed PD output hitting a clamp.
+          - torque_saturated: the PD controller is at its bounded output
+            (see actuate_joint / torque_cap_for_joint) -- a saturated
+            command straight into a rigid joint is one hypothesized cause.
           - at_lower_limit / at_upper_limit: the joint is sitting on its
             changeDynamics jointLowerLimit/jointUpperLimit stop.
           - parent_contact_penetration_m: how deep (in meters) this link is
@@ -1849,19 +1846,13 @@ class PyBulletWorld:
             position = state.get("position")
             velocity = state.get("velocity")
             applied_torque = state.get("applied_torque")
-            target_angle = state.get("motor_command")
+            commanded_torque = state.get("motor_command")
             torque_cap = state.get("torque_cap")
 
-            # Under POSITION_CONTROL there is no separate "commanded torque"
-            # to read back before the solver acts (see actuate_joint) --
-            # "saturated" now means the *applied* torque (read back from
-            # PyBullet after the step) is at/near the motor's force limit,
-            # not that a Python-computed PD output hit its own clamp.
             torque_saturated = (
-                applied_torque is not None
+                commanded_torque is not None
                 and torque_cap is not None
-                and torque_cap > 0
-                and abs(applied_torque) >= 0.99 * torque_cap
+                and abs(abs(commanded_torque) - abs(torque_cap)) < 1e-9
             )
 
             try:
@@ -1884,7 +1875,7 @@ class PyBulletWorld:
             self._diag_writer.writerow([
                 self.time_step, joint.id, pybullet_joint_idx,
                 position, velocity, applied_torque,
-                target_angle, torque_cap, torque_saturated,
+                commanded_torque, torque_cap, torque_saturated,
                 lower_limit, upper_limit, at_lower_limit, at_upper_limit,
                 getattr(joint, 'genome_limits_were_inverted', False),
                 parent_contact_penetration.get(pybullet_joint_idx, 0.0),
